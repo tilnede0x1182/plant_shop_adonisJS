@@ -1,0 +1,10 @@
+@layout('layouts/application')
+
+@section('content')
+<h1>Nouvelle commande</h1>
+<form method="POST" action="{{ route('orders.create') }}">
+	@csrf
+	<p>Valider votre commande ?</p>
+	<button type="submit">Commander</button>
+</form>
+@endsection

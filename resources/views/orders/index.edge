@@ -1,0 +1,18 @@
+@layout('layouts/application')
+
+@section('content')
+<h1>Mes commandes</h1>
+@if(orders.length === 0)
+	<p>Aucune commande trouvée.</p>
+@else
+<ul>
+	@each(order in orders)
+	<li>
+		Commandé le {{ order.createdAt.toLocaleDateString('fr-FR') }} -
+		{{ order.totalPrice }} €
+		({{ order.status }})
+	</li>
+	@endeach
+</ul>
+@endif
+@endsection

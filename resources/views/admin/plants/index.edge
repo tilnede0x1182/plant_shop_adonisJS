@@ -1,0 +1,35 @@
+@extends('layouts/application')
+
+@section('title', 'Gestion des plantes')
+
+@section('content')
+	<h1>Plantes (admin)</h1>
+	<a href="{{ route('Admin/PlantsController.create') }}">Nouvelle plante</a>
+	<table>
+		<thead>
+			<tr>
+				<th>Nom</th>
+				<th>Prix</th>
+				<th>Stock</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@each(plant in plants)
+				<tr>
+					<td>{{ plant.name }}</td>
+					<td>{{ plant.price }} €</td>
+					<td>{{ plant.stock }}</td>
+					<td>
+						<a href="{{ route('Admin/PlantsController.edit', { id: plant.id }) }}">Modifier</a>
+						<form method="POST" action="{{ route('Admin/PlantsController.destroy', { id: plant.id }) }}" style="display:inline">
+							@csrf
+							@method('DELETE')
+							<button type="submit" onclick="return confirm('Supprimer cette plante ?')">Supprimer</button>
+						</form>
+					</td>
+				</tr>
+			@endeach
+		</tbody>
+	</table>
+@endsection

@@ -1,0 +1,15 @@
+@layout('layouts/application')
+
+@section('content')
+<h1>{{ plant.name }}</h1>
+<p>{{ plant.description }}</p>
+<p>Prix : {{ plant.price }} €</p>
+<p>Stock : {{ plant.stock }}</p>
+@if(auth.user)
+<form method="POST" action="{{ route('carts.create') }}">
+	@csrf
+	<input type="hidden" name="plant_id" value="{{ plant.id }}">
+	<button type="submit">Ajouter au panier</button>
+</form>
+@endif
+@endsection

@@ -1,0 +1,23 @@
+<form method="POST" action="{{ action }}">
+	@csrf
+	@if(method !== 'POST')
+		@method(method)
+	@endif
+	<div>
+		<label>Nom</label>
+		<input type="text" name="name" value="{{ plant ? plant.name : '' }}" required>
+	</div>
+	<div>
+		<label>Prix (€)</label>
+		<input type="number" name="price" value="{{ plant ? plant.price : '' }}" min="0" step="0.01" required>
+	</div>
+	<div>
+		<label>Description</label>
+		<textarea name="description" required>{{ plant ? plant.description : '' }}</textarea>
+	</div>
+	<div>
+		<label>Stock</label>
+		<input type="number" name="stock" value="{{ plant ? plant.stock : '' }}" min="0" required>
+	</div>
+	<button type="submit">Enregistrer</button>
+</form>

@@ -1,0 +1,8 @@
+@extends('layouts/application')
+
+@section('title', 'Modifier plante')
+
+@section('content')
+	<h1>Modifier la plante</h1>
+	@include('admin/plants/_form', { plant: plant, action: route('Admin/PlantsController.update', { id: plant.id }), method: 'PUT' })
+@endsection

@@ -1,0 +1,13 @@
+@layout('layouts/application')
+
+@section('content')
+<h1>Plantes disponibles</h1>
+<ul>
+	@each(plant in plants)
+	<li>
+		<a href="{{ route('plants.show', {id: plant.id}) }}">{{ plant.name }}</a>
+		({{ plant.price }} €)
+	</li>
+	@endeach
+</ul>
+@endsection
