@@ -1,0 +1,23 @@
+@extends('layouts/application')
+
+@section('title', 'Connexion')
+
+@section('content')
+	<h1>Connexion</h1>
+	@if(flashMessages.get('error'))
+		<div class="alert alert-danger">{{ flashMessages.get('error') }}</div>
+	@endif
+	<form method="POST" action="{{ route('SessionsController.login') }}">
+		@csrf
+		<div>
+			<label>Email</label>
+			<input type="email" name="email" required>
+		</div>
+		<div>
+			<label>Mot de passe</label>
+			<input type="password" name="password" required>
+		</div>
+		<button type="submit">Se connecter</button>
+	</form>
+	<a href="{{ route('RegistrationsController.showRegisterForm') }}">Créer un compte</a>
+@endsection

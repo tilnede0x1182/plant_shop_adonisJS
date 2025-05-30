@@ -1,0 +1,5 @@
+@if(flashMessages.all())
+	@each(key in flashMessages.keys())
+		<div class="flash-{{ key }}">{{ flashMessages.get(key) }}</div>
+	@endeach
+@endif

@@ -1,0 +1,13 @@
+<nav>
+	<a href="{{ route('PlantsController.index') }}">Accueil</a>
+	@if(auth.user)
+		<a href="{{ route('UsersController.show', { id: auth.user.id }) }}">Profil</a>
+		<form method="POST" action="{{ route('SessionsController.logout') }}" style="display:inline">
+			@csrf
+			<button type="submit">Déconnexion</button>
+		</form>
+	@else
+		<a href="{{ route('SessionsController.showLoginForm') }}">Connexion</a>
+		<a href="{{ route('RegistrationsController.showRegisterForm') }}">Inscription</a>
+	@endif
+</nav>
