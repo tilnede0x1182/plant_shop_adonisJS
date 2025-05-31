@@ -16,6 +16,7 @@ import Order from 'App/Models/Order'
 import OrderItem from 'App/Models/OrderItem'
 import * as fs from 'fs'
 import * as path from 'path'
+import Hash from '@ioc:Adonis/Core/Hash'
 import { faker } from '@faker-js/faker'
 
 /**
@@ -36,9 +37,10 @@ async function createAdmins(nombreAdmins: number) {
 	const admins = []
 	for (let index = 0; index < nombreAdmins; index++) {
 		const password = 'password'
+		const hashedPassword = await Hash.make(password)
 		const admin = await User.create({
 			email: `admin${index + 1}@planteshop.com`,
-			password: password,
+			password: hashedPassword,
 			admin: true,
 			name: faker.person.fullName()
 		})
@@ -55,9 +57,10 @@ async function createUsers(nombreUsers: number) {
 	const users = []
 	for (let index = 0; index < nombreUsers; index++) {
 		const password = faker.internet.password({ length: 12 })
+		const hashedPassword = await Hash.make(password)
 		const user = await User.create({
 			email: faker.internet.email(),
-			password: password,
+			password: hashedPassword,
 			admin: false,
 			name: faker.person.fullName()
 		})

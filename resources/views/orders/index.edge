@@ -1,18 +1,22 @@
 @layout('layouts/application')
 
+@section('title')
+Mes commandes
+@end
+
 @section('content')
 <h1>Mes commandes</h1>
-@if(orders.length === 0)
-	<p>Aucune commande trouvée.</p>
+@if(orders && orders.length > 0)
+	<ul>
+		@each(order in orders)
+			<li>
+				<a href="{{ route('OrdersController.show', { id: order.id }) }}">
+					Commande #{{ order.id }} du {{ order.createdAt.toLocaleDateString() }} - {{ order.totalPrice }} €
+				</a>
+			</li>
+		@endeach
+	</ul>
 @else
-<ul>
-	@each(order in orders)
-	<li>
-		Commandé le {{ order.createdAt.toLocaleDateString('fr-FR') }} -
-		{{ order.totalPrice }} €
-		({{ order.status }})
-	</li>
-	@endeach
-</ul>
+	<p>Aucune commande trouvée.</p>
 @endif
-@endsection
+@end

@@ -1,5 +1,9 @@
 @layout('layouts/application')
 
+@section('title')
+Liste des utilisateurs
+@end
+
 @section('content')
 <h1>Liste des utilisateurs</h1>
 <table>
@@ -20,11 +24,11 @@
 			<td>{{ user.email }}</td>
 			<td>{{ user.admin ? 'Oui' : 'Non' }}</td>
 			<td>
-				<a href="{{ route('admin.users.show', {id: user.id}) }}">Afficher</a>
-				<a href="{{ route('admin.users.edit', {id: user.id}) }}">Modifier</a>
+				<a href="{{ route('admin.users.show', { id: user.id }) }}">Afficher</a>
+				<a href="{{ route('admin.users.edit', { id: user.id }) }}">Modifier</a>
 			</td>
 		</tr>
 		@endeach
 	</tbody>
 </table>
-@endsection
+@end

@@ -23,7 +23,7 @@ export default class SessionsController {
 		const user = await User.query().where('email', email).first()
 		if (!user || !(await Hash.verify(user.password, password))) {
 			session.flash({ error: 'Identifiants invalides.' })
-			return response.redirect().toRoute('login')
+			return response.redirect().toRoute('login.perform')
 		}
 		await auth.login(user)
 		return response.redirect().toRoute('plants.index')
@@ -34,6 +34,6 @@ export default class SessionsController {
 	 */
 	public async logout({ auth, response }: HttpContextContract) {
 		await auth.logout()
-		return response.redirect().toRoute('login')
+		return response.redirect().toRoute('logout')
 	}
 }

@@ -3,7 +3,7 @@
 @section('content')
 <h1>Modifier la plante</h1>
 <form method="POST" action="{{ route('plants.update', {id: plant.id}) }}">
-	@csrf
+	{{ csrfField() }}
 	<input type="hidden" name="_method" value="PUT">
 	<label>Nom : <input type="text" name="name" value="{{ plant.name }}"></label><br>
 	<label>Description : <textarea name="description">{{ plant.description }}</textarea></label><br>

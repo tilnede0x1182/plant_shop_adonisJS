@@ -60,7 +60,6 @@
 ├── Makefile
 ├── package.json
 ├── package-lock.json
-├── projet_adonis.txt
 ├── projet.txt
 ├── providers
 │   └── AppProvider.ts
@@ -81,6 +80,8 @@
 │   │   │       ├── edit.edge
 │   │   │       ├── index.edge
 │   │   │       └── show.edge
+│   │   ├── carts
+│   │   │   └── index.edge
 │   │   ├── errors
 │   │   │   ├── not-found.edge
 │   │   │   ├── server-error.edge
@@ -119,7 +120,7 @@
 ├── tsconfig.json
 └── users.txt
 
-33 directories, 84 files
+34 directories, 84 files
 
 # CONFIG
 #
@@ -1184,7 +1185,7 @@ export default class SessionsController {
 		const user = await User.query().where('email', email).first()
 		if (!user || !(await Hash.verify(user.password, password))) {
 			session.flash({ error: 'Identifiants invalides.' })
-			return response.redirect().toRoute('login')
+			return response.redirect().toRoute('login.perform')
 		}
 		await auth.login(user)
 		return response.redirect().toRoute('plants.index')
@@ -1195,7 +1196,7 @@ export default class SessionsController {
 	 */
 	public async logout({ auth, response }: HttpContextContract) {
 		await auth.logout()
-		return response.redirect().toRoute('login')
+		return response.redirect().toRoute('logout')
 	}
 }
 
@@ -1273,28 +1274,30 @@ export default class UsersController {
 
 // app/Controllers/Http/PlantsController.ts
 
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Plant from 'App/Models/Plant'
+import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import Plant from "App/Models/Plant";
 
 /**
  * Contrôleur public des plantes
  */
 export default class PlantsController {
-	/**
-	 * Liste des plantes en stock (stock >= 1)
-	 */
-	public async index({ view }: HttpContextContract) {
-		const plants = await Plant.query().where('stock', '>=', 1).orderBy('name', 'asc')
+  /**
+   * Liste des plantes en stock (stock >= 1)
+   */
+  public async index({ view }: HttpContextContract) {
+    const plants = await Plant.query()
+      .where("stock", ">=", 1)
+      .orderBy("name", "asc");
     return view.render("plants/index", { plants });
-	}
+  }
 
-	/**
-	 * Affiche une plante
-	 */
-	public async show({ params, view }: HttpContextContract) {
-		const plante = await Plant.findOrFail(params.id)
-		return view.render('plants/show', { plante })
-	}
+  /**
+   * Affiche une plante
+   */
+  public async show({ params, view }: HttpContextContract) {
+    const plante = await Plant.findOrFail(params.id);
+    return view.render("plants/show", { plante });
+  }
 }
 
 
@@ -1464,34 +1467,32 @@ Route.post('/logout', 'SessionsController.logout').as('logout')
 Route.get('/register', 'RegistrationsController.showRegisterForm').as('register.show')
 Route.post('/register', 'RegistrationsController.register').as('register.perform')
 
-// Profil personnel
-Route.resource('users', 'UsersController')
-  .only(['show', 'edit', 'update'])
-
 // Plantes (public)
-Route.resource('plants', 'PlantsController')
-  .only(['index', 'show'])
+Route.resource('plants', 'PlantsController').only(['index', 'show'])
 
-// Panier
-Route.resource('carts', 'CartsController')
-  .only(['index', 'create', 'destroy'])
+// Page d'accueil
+Route.get('/', 'PlantsController.index').as('home')
 
-// Commandes
-Route.resource('orders', 'OrdersController')
-  .only(['index', 'create'])
+// Routes nécessitant une authentification
+Route.group(() => {
+  // Profil personnel
+  Route.resource('users', 'UsersController').only(['show', 'edit', 'update'])
+
+  // Panier
+  Route.resource('carts', 'CartsController').only(['index'])
+
+  // Commandes
+  Route.resource('orders', 'OrdersController').only(['index', 'new', 'create'])
+}).middleware('auth')
 
 // Administration
 Route.group(() => {
-  Route.resource('plants', 'Admin/PlantsController')
-    .except(['show'])
-  Route.resource('users', 'Admin/UsersController')
-    .only(['index', 'show', 'edit', 'update', 'destroy'])
+  Route.resource('plants', 'Admin/PlantsController').except(['show'])
+  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit', 'update', 'destroy'])
 })
   .prefix('/admin')
   .as('admin')
-
-// Page d’accueil
-Route.get('/', 'PlantsController.index').as('home')
+  .middleware('auth')
 
 
 ## start/kernel.ts
@@ -1519,9 +1520,10 @@ import Server from '@ioc:Adonis/Core/Server'
 |
 */
 Server.middleware.register([
-  () => import('@ioc:Adonis/Core/BodyParser'),
+	() => import('@ioc:Adonis/Core/BodyParser'),
 	() => import('@ioc:Adonis/Addons/Shield'),
 ])
+
 
 /*
 |--------------------------------------------------------------------------
@@ -1540,6 +1542,8 @@ Server.middleware.register([
 |
 */
 Server.middleware.registerNamed({
+  auth: () => import('App/Middleware/Auth'),
+  silentAuth: () => import('App/Middleware/SilentAuth'),
 })
 
 
@@ -1727,6 +1731,7 @@ import Order from 'App/Models/Order'
 import OrderItem from 'App/Models/OrderItem'
 import * as fs from 'fs'
 import * as path from 'path'
+import Hash from '@ioc:Adonis/Core/Hash'
 import { faker } from '@faker-js/faker'
 
 /**
@@ -1747,9 +1752,10 @@ async function createAdmins(nombreAdmins: number) {
 	const admins = []
 	for (let index = 0; index < nombreAdmins; index++) {
 		const password = 'password'
+		const hashedPassword = await Hash.make(password)
 		const admin = await User.create({
 			email: `admin${index + 1}@planteshop.com`,
-			password: password,
+			password: hashedPassword,
 			admin: true,
 			name: faker.person.fullName()
 		})
@@ -1766,9 +1772,10 @@ async function createUsers(nombreUsers: number) {
 	const users = []
 	for (let index = 0; index < nombreUsers; index++) {
 		const password = faker.internet.password({ length: 12 })
+		const hashedPassword = await Hash.make(password)
 		const user = await User.create({
 			email: faker.internet.email(),
-			password: password,
+			password: hashedPassword,
 			admin: false,
 			name: faker.person.fullName()
 		})
@@ -1922,37 +1929,43 @@ Connexion
 
 ## resources/views/admin/plants/edit.edge
 
-@extends('layouts/application')
+@layout('layouts/application')
 
-@section('title', 'Modifier plante')
+@section('title')
+Modifier plante
+@end
 
 @section('content')
 	<h1>Modifier la plante</h1>
-	@include('admin/plants/_form', { plant: plant, action: route('Admin/PlantsController.update', { id: plant.id }), method: 'PUT' })
-@endsection
+	@include('admin/plants/_form', { plant: plant, action: route('AdminPlantsController.update', { id: plant.id }), method: 'PUT' })
+@end
 
 
 ## resources/views/admin/plants/new.edge
 
-@extends('layouts/application')
+@layout('layouts/application')
 
-@section('title', 'Nouvelle plante')
+@section('title')
+Nouvelle plante
+@end
 
 @section('content')
 	<h1>Créer une plante</h1>
-	@include('admin/plants/_form', { plant: null, action: route('Admin/PlantsController.store'), method: 'POST' })
-@endsection
+	@include('admin/plants/_form', { plant: null, action: route('AdminPlantsController.store'), method: 'POST' })
+@end
 
 
 ## resources/views/admin/plants/index.edge
 
-@extends('layouts/application')
+@layout('layouts/application')
 
-@section('title', 'Gestion des plantes')
+@section('title')
+Gestion des plantes
+@end
 
 @section('content')
 	<h1>Plantes (admin)</h1>
-	<a href="{{ route('Admin/PlantsController.create') }}">Nouvelle plante</a>
+	<a href="{{ route('AdminPlantsController.create') }}">Nouvelle plante</a>
 	<table>
 		<thead>
 			<tr>
@@ -1969,10 +1982,10 @@ Connexion
 					<td>{{ plant.price }} €</td>
 					<td>{{ plant.stock }}</td>
 					<td>
-						<a href="{{ route('Admin/PlantsController.edit', { id: plant.id }) }}">Modifier</a>
-						<form method="POST" action="{{ route('Admin/PlantsController.destroy', { id: plant.id }) }}" style="display:inline">
-							@csrf
-							@method('DELETE')
+						<a href="{{ route('AdminPlantsController.edit', { id: plant.id }) }}">Modifier</a>
+						<form method="POST" action="{{ route('AdminPlantsController.destroy', { id: plant.id }) }}" style="display:inline">
+							{{ csrfField() }}
+							<input type="hidden" name="_method" value="DELETE">
 							<button type="submit" onclick="return confirm('Supprimer cette plante ?')">Supprimer</button>
 						</form>
 					</td>
@@ -1980,16 +1993,16 @@ Connexion
 			@endeach
 		</tbody>
 	</table>
-@endsection
+@end
 
 
 ## resources/views/admin/plants/_form.edge
 
 <form method="POST" action="{{ action }}">
-	@csrf
+	{{ csrfField() }}
 	@if(method !== 'POST')
-		@method(method)
-	@endif
+		<input type="hidden" name="_method" value="{{ method }}">
+	@end
 	<div>
 		<label>Nom</label>
 		<input type="text" name="name" value="{{ plant ? plant.name : '' }}" required>
@@ -2014,6 +2027,10 @@ Connexion
 
 @layout('layouts/application')
 
+@section('title')
+Détail utilisateur
+@end
+
 @section('content')
 <h1>Détail utilisateur</h1>
 <ul>
@@ -2022,30 +2039,38 @@ Connexion
 	<li>Email : {{ user.email }}</li>
 	<li>Admin : {{ user.admin ? 'Oui' : 'Non' }}</li>
 </ul>
-<a href="{{ route('admin.users.edit', {id: user.id}) }}">Modifier</a>
-@endsection
+<a href="{{ route('admin.users.edit', { id: user.id }) }}">Modifier</a>
+@end
 
 
 ## resources/views/admin/users/edit.edge
 
 @layout('layouts/application')
 
+@section('title')
+Modifier l’utilisateur
+@end
+
 @section('content')
 <h1>Modifier l’utilisateur</h1>
-<form method="POST" action="{{ route('admin.users.update', {id: user.id}) }}">
-	@csrf
+<form method="POST" action="{{ route('admin.users.update', { id: user.id }) }}">
+	{{ csrfField() }}
 	<input type="hidden" name="_method" value="PUT">
 	<label>Nom : <input type="text" name="name" value="{{ user.name }}"></label><br>
 	<label>Email : <input type="email" name="email" value="{{ user.email }}"></label><br>
 	<label>Admin : <input type="checkbox" name="admin" {{ user.admin ? 'checked' : '' }}></label><br>
 	<button type="submit">Valider</button>
 </form>
-@endsection
+@end
 
 
 ## resources/views/admin/users/index.edge
 
 @layout('layouts/application')
+
+@section('title')
+Liste des utilisateurs
+@end
 
 @section('content')
 <h1>Liste des utilisateurs</h1>
@@ -2067,33 +2092,53 @@ Connexion
 			<td>{{ user.email }}</td>
 			<td>{{ user.admin ? 'Oui' : 'Non' }}</td>
 			<td>
-				<a href="{{ route('admin.users.show', {id: user.id}) }}">Afficher</a>
-				<a href="{{ route('admin.users.edit', {id: user.id}) }}">Modifier</a>
+				<a href="{{ route('admin.users.show', { id: user.id }) }}">Afficher</a>
+				<a href="{{ route('admin.users.edit', { id: user.id }) }}">Modifier</a>
 			</td>
 		</tr>
 		@endeach
 	</tbody>
 </table>
-@endsection
+@end
 
 
 ## resources/views/plants/show.edge
 
 @layout('layouts/application')
 
+@section('title')
+{{ plante.name }}
+@end
+
 @section('content')
-<h1>{{ plant.name }}</h1>
-<p>{{ plant.description }}</p>
-<p>Prix : {{ plant.price }} €</p>
-<p>Stock : {{ plant.stock }}</p>
-@if(auth.user)
-<form method="POST" action="{{ route('carts.create') }}">
-	@csrf
-	<input type="hidden" name="plant_id" value="{{ plant.id }}">
-	<button type="submit">Ajouter au panier</button>
-</form>
-@endif
-@endsection
+<div class="card shadow-lg">
+	<div class="card-body">
+		<h1 class="card-title">{{ plante.name }}</h1>
+		<p><strong>Prix :</strong> {{ plante.price }} €</p>
+		<p><strong>Description :</strong> {{ plante.description }}</p>
+		@if(auth.user?.admin)
+			<p><strong>Stock :</strong> {{ plante.stock }} unités</p>
+		@end
+		<div class="d-flex flex-wrap gap-2 mb-2">
+			<button class="btn btn-success"
+				onclick="cartInstance.add({{ plante.id }}, '{{ plante.name }}', {{ plante.price }}, {{ plante.stock }})">
+				Ajouter au panier
+			</button>
+			@if(auth.user?.admin)
+				<a href="{{ route('AdminPlantsController.edit', { id: plante.id }) }}" class="btn btn-warning">Modifier</a>
+				<form method="POST" action="{{ route('AdminPlantsController.destroy', { id: plante.id }) }}" class="d-inline" onsubmit="return confirm('Supprimer cette plante ?')">
+					{{ csrfField() }}
+					<input type="hidden" name="_method" value="DELETE">
+					<button type="submit" class="btn btn-danger">Supprimer</button>
+				</form>
+			@end
+		</div>
+		<div class="mt-3">
+			<a href="{{ route('PlantsController.index') }}" class="btn btn-secondary">Retour à la liste</a>
+		</div>
+	</div>
+</div>
+@end
 
 
 ## resources/views/plants/edit.edge
@@ -2129,6 +2174,13 @@ Liste des plantes
 	<a href="{{ route('Admin/PlantsController.create') }}" class="btn btn-info mb-3">Nouvelle Plante</a>
 @endif
 
+@if(auth.user)
+	<p>Connecté en tant que : {{ auth.user.email }} ({{ auth.user.admin ? 'admin' : 'user' }})</p>
+@else
+	<p>Non connecté</p>
+@endif
+
+
 <div class="row">
 	@each(plant in plants)
 	<div class="col-md-4">
@@ -2157,18 +2209,36 @@ Liste des plantes
 @endsection
 
 
+## resources/views/carts/index.edge
+
+@layout('layouts/application')
+
+@section('title')
+Mon panier
+@endsection
+
+@section('content')
+	<h1>Mon Panier</h1>
+	<div id="cart-container"></div>
+@endsection
+
+
 ## resources/views/orders/new.edge
 
 @layout('layouts/application')
 
+@section('title')
+Nouvelle commande
+@end
+
 @section('content')
 <h1>Nouvelle commande</h1>
-<form method="POST" action="{{ route('orders.create') }}">
-	@csrf
+<form method="POST" action="{{ route('OrdersController.create') }}">
+	{{ csrfField() }}
 	<p>Valider votre commande ?</p>
 	<button type="submit">Commander</button>
 </form>
-@endsection
+@end
 
 
 ## resources/views/orders/_order_card.edge
@@ -2183,42 +2253,50 @@ Liste des plantes
 
 @layout('layouts/application')
 
+@section('title')
+Mes commandes
+@end
+
 @section('content')
 <h1>Mes commandes</h1>
-@if(orders.length === 0)
-	<p>Aucune commande trouvée.</p>
+@if(orders && orders.length > 0)
+	<ul>
+		@each(order in orders)
+			<li>
+				<a href="{{ route('OrdersController.show', { id: order.id }) }}">
+					Commande #{{ order.id }} du {{ order.createdAt.toLocaleDateString() }} - {{ order.totalPrice }} €
+				</a>
+			</li>
+		@endeach
+	</ul>
 @else
-<ul>
-	@each(order in orders)
-	<li>
-		Commandé le {{ order.createdAt.toLocaleDateString('fr-FR') }} -
-		{{ order.totalPrice }} €
-		({{ order.status }})
-	</li>
-	@endeach
-</ul>
+	<p>Aucune commande trouvée.</p>
 @endif
-@endsection
+@end
 
 
 ## resources/views/orders/create.edge
 
 @layout('layouts/application')
 
+@section('title')
+Commande créée
+@end
+
 @section('content')
 <h1>Commande créée</h1>
 <p>Votre commande a bien été enregistrée.</p>
-<a href="{{ route('orders.index') }}">Retour à mes commandes</a>
-@endsection
+<a href="{{ route('OrdersController.index') }}">Retour à mes commandes</a>
+@end
 
 
 ## resources/views/layouts/_flash_messages.edge
 
-@if(flashMessages.all())
+{{-- @if(flashMessages?.all())
 	@each(key in flashMessages.keys())
 		<div class="flash-{{ key }}">{{ flashMessages.get(key) }}</div>
 	@endeach
-@endif
+@endif --}}
 
 
 ## resources/views/layouts/application.edge
@@ -2228,7 +2306,7 @@ Liste des plantes
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>@!section('title', 'PlantShop')</title>
+	<title>Magasin de plantes</title>
 
 	<!-- Bootstrap CSS -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -2238,15 +2316,15 @@ Liste des plantes
 	<script src="/js/application.js"></script>
 </head>
 <body>
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 	@include('layouts/_flash_messages')
 	@include('layouts/_navbar')
 
 	<div class="container mt-4">
 		@!section('content')
 	</div>
-
-	<!-- Bootstrap JS -->
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
@@ -2360,44 +2438,72 @@ S'inscrire
 
 ## resources/views/errors/unauthorized.edge
 
-<p> It's a 403 </p>
+@layout('layouts/application')
+
+@section('title')
+Erreur 403
+@end
+
+@section('content')
+<p>It's a 403</p>
+@end
 
 
 ## resources/views/errors/server-error.edge
 
-<p> It's a 500 </p>
+@layout('layouts/application')
+
+@section('title')
+Erreur 500
+@end
+
+@section('content')
+<p>It's a 500</p>
+@end
 
 
 ## resources/views/errors/not-found.edge
 
-<p> It's a 404 </p>
+@layout('layouts/application')
+
+@section('title')
+Erreur 404
+@end
+
+@section('content')
+<p>It's a 404</p>
+@end
 
 
 ## resources/views/users/show.edge
 
-@extends('layouts/application')
+@layout('layouts/application')
 
-@section('title', 'Mon profil')
+@section('title')
+Mon profil
+@end
 
 @section('content')
 	<h1>Profil</h1>
 	<p><strong>Nom :</strong> {{ user.name }}</p>
 	<p><strong>Email :</strong> {{ user.email }}</p>
 	<a href="{{ route('UsersController.edit', { id: user.id }) }}">Modifier</a>
-@endsection
+@end
 
 
 ## resources/views/users/edit.edge
 
-@extends('layouts/application')
+@layout('layouts/application')
 
-@section('title', 'Modifier mon profil')
+@section('title')
+Modifier mon profil
+@end
 
 @section('content')
 	<h1>Modifier le profil</h1>
 	<form method="POST" action="{{ route('UsersController.update', { id: user.id }) }}">
-		@csrf
-		@method('PUT')
+		{{ csrfField() }}
+		<input type="hidden" name="_method" value="PUT">
 		<div>
 			<label>Nom</label>
 			<input type="text" name="name" value="{{ user.name }}" required>
@@ -2408,7 +2514,7 @@ S'inscrire
 		</div>
 		<button type="submit">Mettre à jour</button>
 	</form>
-@endsection
+@end
 
 
 
@@ -2678,7 +2784,7 @@ export default listDirectoryFiles(__dirname, Application.appRoot, ['./commands/i
       1 ## env.ts
       1 ## package.json
       1 ## providers
-     24 ## resources
+     25 ## resources
       1 ## server.ts
       2 ## start
       1 ## tsconfig.json

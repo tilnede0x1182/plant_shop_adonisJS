@@ -1,20 +1,22 @@
-@extends('layouts/application')
+@layout('layouts/application')
 
-@section('title', 'Modifier mon profil')
+@section('title')
+Modifier mon profil
+@end
 
 @section('content')
 	<h1>Modifier le profil</h1>
-	<form method="POST" action="{{ route('UsersController.update', { id: user.id }) }}">
-		@csrf
-		@method('PUT')
+	<form method="POST" action="{{ route('UsersController.update', { id: utilisateur.id }) }}">
+		{{ csrfField() }}
+		<input type="hidden" name="_method" value="PUT">
 		<div>
 			<label>Nom</label>
-			<input type="text" name="name" value="{{ user.name }}" required>
+			<input type="text" name="name" value="{{ utilisateur.name }}" required>
 		</div>
 		<div>
 			<label>Email</label>
-			<input type="email" name="email" value="{{ user.email }}" required>
+			<input type="email" name="email" value="{{ utilisateur.email }}" required>
 		</div>
 		<button type="submit">Mettre à jour</button>
 	</form>
-@endsection
+@end

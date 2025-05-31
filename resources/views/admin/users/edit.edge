@@ -1,13 +1,17 @@
 @layout('layouts/application')
 
+@section('title')
+Modifier l’utilisateur
+@end
+
 @section('content')
 <h1>Modifier l’utilisateur</h1>
-<form method="POST" action="{{ route('admin.users.update', {id: user.id}) }}">
-	@csrf
+<form method="POST" action="{{ route('admin.users.update', { id: user.id }) }}">
+	{{ csrfField() }}
 	<input type="hidden" name="_method" value="PUT">
 	<label>Nom : <input type="text" name="name" value="{{ user.name }}"></label><br>
 	<label>Email : <input type="email" name="email" value="{{ user.email }}"></label><br>
 	<label>Admin : <input type="checkbox" name="admin" {{ user.admin ? 'checked' : '' }}></label><br>
 	<button type="submit">Valider</button>
 </form>
-@endsection
+@end

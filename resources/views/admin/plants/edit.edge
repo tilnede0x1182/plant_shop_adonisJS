@@ -1,8 +1,10 @@
-@extends('layouts/application')
+@layout('layouts/application')
 
-@section('title', 'Modifier plante')
+@section('title')
+Modifier plante
+@end
 
 @section('content')
 	<h1>Modifier la plante</h1>
-	@include('admin/plants/_form', { plant: plant, action: route('Admin/PlantsController.update', { id: plant.id }), method: 'PUT' })
-@endsection
+	@include('admin/plants/_form', { plant: plant, action: route('AdminPlantsController.update', { id: plant.id }), method: 'PUT' })
+@end
