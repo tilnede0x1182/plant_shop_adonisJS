@@ -1,5 +1,9 @@
 @layout('layouts/application')
 
+@section('title')
+Détail utilisateur
+@end
+
 @section('content')
 <h1>Détail utilisateur</h1>
 <ul>
@@ -8,5 +12,5 @@
 	<li>Email : {{ user.email }}</li>
 	<li>Admin : {{ user.admin ? 'Oui' : 'Non' }}</li>
 </ul>
-<a href="{{ route('admin.users.edit', {id: user.id}) }}">Modifier</a>
-@endsection
+<a href="{{ route('admin.users.edit', { id: user.id }) }}">Modifier</a>
+@end

@@ -22,31 +22,31 @@ Route.post('/logout', 'SessionsController.logout').as('logout')
 Route.get('/register', 'RegistrationsController.showRegisterForm').as('register.show')
 Route.post('/register', 'RegistrationsController.register').as('register.perform')
 
-// Profil personnel
-Route.resource('users', 'UsersController')
-  .only(['show', 'edit', 'update'])
-
 // Plantes (public)
-Route.resource('plants', 'PlantsController')
-  .only(['index', 'show'])
+Route.resource('plants', 'PlantsController').only(['index', 'show'])
 
-// Panier
-Route.resource('carts', 'CartsController')
-  .only(['index', 'create', 'destroy'])
+// Page d'accueil
+Route.get('/', 'PlantsController.index').as('home')
 
-// Commandes
-Route.resource('orders', 'OrdersController')
-  .only(['index', 'create'])
+// Routes nécessitant une authentification
+Route.group(() => {
+  // Profil personnel
+  Route.resource('users', 'UsersController').only(['show', 'edit', 'update'])
+
+  // Panier
+  Route.resource('carts', 'CartsController').only(['index'])
+
+  // Commandes - Routes explicites pour éviter les conflits
+  Route.get('/orders', 'OrdersController.index').as('orders.index')
+  Route.get('/orders/new', 'OrdersController.new').as('orders.new')
+  Route.post('/orders', 'OrdersController.create').as('orders.create')
+}).middleware('auth')
 
 // Administration
 Route.group(() => {
-  Route.resource('plants', 'Admin/PlantsController')
-    .except(['show'])
-  Route.resource('users', 'Admin/UsersController')
-    .only(['index', 'show', 'edit', 'update', 'destroy'])
+  Route.resource('plants', 'Admin/PlantsController').except(['show'])
+  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit', 'update', 'destroy'])
 })
   .prefix('/admin')
   .as('admin')
-
-// Page d’accueil
-Route.get('/', 'PlantsController.index').as('home')
+  .middleware('auth')

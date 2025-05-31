@@ -38,7 +38,7 @@
 					@endif
 					<li class="nav-item">
 						<form method="POST" action="{{ route('logout') }}">
-							@csrf
+							{{ csrfField() }}
 							<button type="submit" class="nav-link btn btn-link p-0" style="text-decoration: none;">Déconnexion</button>
 						</form>
 					</li>

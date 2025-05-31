@@ -1,8 +1,10 @@
-@extends('layouts/application')
+@layout('layouts/application')
 
-@section('title', 'Nouvelle plante')
+@section('title')
+Nouvelle plante
+@end
 
 @section('content')
 	<h1>Créer une plante</h1>
-	@include('admin/plants/_form', { plant: null, action: route('Admin/PlantsController.store'), method: 'POST' })
-@endsection
+	@include('admin/plants/_form', { plant: null, action: route('AdminPlantsController.store'), method: 'POST' })
+@end

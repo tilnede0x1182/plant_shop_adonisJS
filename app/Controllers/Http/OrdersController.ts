@@ -1,6 +1,7 @@
 // app/Controllers/Http/OrdersController.ts
 
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import Order from 'App/Models/Order'
 import Plant from 'App/Models/Plant'
 import OrderItem from 'App/Models/OrderItem'
@@ -34,7 +35,7 @@ export default class OrdersController {
 		const items = JSON.parse(request.input('order.items', '[]'))
 		let total = 0
 
-		const trx = await Order.db.transaction()
+		const trx = await Database.transaction()
 		try {
 			const commande = await Order.create({
 				userId: auth.user!.id,

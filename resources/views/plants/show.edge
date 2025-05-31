@@ -1,15 +1,35 @@
 @layout('layouts/application')
 
+@section('title')
+{{ plante.name }}
+@end
+
 @section('content')
-<h1>{{ plant.name }}</h1>
-<p>{{ plant.description }}</p>
-<p>Prix : {{ plant.price }} €</p>
-<p>Stock : {{ plant.stock }}</p>
-@if(auth.user)
-<form method="POST" action="{{ route('carts.create') }}">
-	@csrf
-	<input type="hidden" name="plant_id" value="{{ plant.id }}">
-	<button type="submit">Ajouter au panier</button>
-</form>
-@endif
-@endsection
+<div class="card shadow-lg">
+	<div class="card-body">
+		<h1 class="card-title">{{ plante.name }}</h1>
+		<p><strong>Prix :</strong> {{ plante.price }} €</p>
+		<p><strong>Description :</strong> {{ plante.description }}</p>
+		@if(auth.user?.admin)
+			<p><strong>Stock :</strong> {{ plante.stock }} unités</p>
+		@end
+		<div class="d-flex flex-wrap gap-2 mb-2">
+			<button class="btn btn-success"
+				onclick="cartInstance.add({{ plante.id }}, '{{ plante.name }}', {{ plante.price }}, {{ plante.stock }})">
+				Ajouter au panier
+			</button>
+			@if(auth.user?.admin)
+				<a href="{{ route('AdminPlantsController.edit', { id: plante.id }) }}" class="btn btn-warning">Modifier</a>
+				<form method="POST" action="{{ route('AdminPlantsController.destroy', { id: plante.id }) }}" class="d-inline" onsubmit="return confirm('Supprimer cette plante ?')">
+					{{ csrfField() }}
+					<input type="hidden" name="_method" value="DELETE">
+					<button type="submit" class="btn btn-danger">Supprimer</button>
+				</form>
+			@end
+		</div>
+		<div class="mt-3">
+			<a href="{{ route('PlantsController.index') }}" class="btn btn-secondary">Retour à la liste</a>
+		</div>
+	</div>
+</div>
+@end

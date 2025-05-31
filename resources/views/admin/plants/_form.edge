@@ -1,8 +1,8 @@
 <form method="POST" action="{{ action }}">
-	@csrf
+	{{ csrfField() }}
 	@if(method !== 'POST')
-		@method(method)
-	@endif
+		<input type="hidden" name="_method" value="{{ method }}">
+	@end
 	<div>
 		<label>Nom</label>
 		<input type="text" name="name" value="{{ plant ? plant.name : '' }}" required>

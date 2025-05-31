@@ -1,10 +1,32 @@
 @layout('layouts/application')
 
+@section('title')
+Nouvelle commande
+@end
+
 @section('content')
-<h1>Nouvelle commande</h1>
-<form method="POST" action="{{ route('orders.create') }}">
-	@csrf
-	<p>Valider votre commande ?</p>
-	<button type="submit">Commander</button>
+<h1 class="text-center mb-4">Valider ma commande</h1>
+
+@if(flashMessages.get('alert'))
+	<div class="alert alert-danger">
+		{{ flashMessages.get('alert') }}
+	</div>
+@endif
+
+<div id="order-review-container">
+	<p class="alert alert-info">Chargement de votre panier...</p>
+</div>
+
+<form id="order-form" method="POST" action="{{ route('OrdersController.create') }}">
+	{{ csrfField() }}
+	<input type="hidden" name="order.items" id="order-items-input">
+	<button type="submit" class="btn btn-success w-100 mt-3">Confirmer la commande</button>
 </form>
-@endsection
+
+<script>
+document.getElementById("order-form").addEventListener("submit", function() {
+	cartInstance.clear()
+})
+</script>
+
+@end
