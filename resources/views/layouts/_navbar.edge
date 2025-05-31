@@ -7,16 +7,20 @@
 
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav ms-auto">
-				@if(auth.user)
+				@if(auth.user && auth.user.name)
 					<li class="nav-item d-flex align-items-center text-white me-3">
-						{{ auth.user.name }}
-						@if(auth.user.admin)
+						{{ auth.user.name.split(' ').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') }}
+						@if(typeof auth.user.admin !== 'undefined' && auth.user.admin)
 							(Administrateur)
 						@endif
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('carts.index') }}">Mon Panier</a>
-					</li>
+				@endif
+
+				<li class="nav-item">
+					<a class="nav-link" href="{{ route('carts.index') }}" id="cart-link">Mon Panier</a>
+				</li>
+
+				@if(auth.user)
 					<li class="nav-item">
 						<a class="nav-link" href="{{ route('orders.index') }}">Mes Commandes</a>
 					</li>
@@ -35,7 +39,7 @@
 					<li class="nav-item">
 						<form method="POST" action="{{ route('logout') }}">
 							@csrf
-							<button type="submit" class="btn btn-link nav-link">Déconnexion</button>
+							<button type="submit" class="nav-link btn btn-link p-0" style="text-decoration: none;">Déconnexion</button>
 						</form>
 					</li>
 				@else
