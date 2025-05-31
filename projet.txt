@@ -1,0 +1,2615 @@
+
+# ARBORESCENCE
+#
+/home/tilnede0x1182/code/tilnede0x1182/Personnel/2025/Entrainement/Javascript/AdonisJS/plant_shop_adonisJS
+├── ace
+├── ace-manifest.json
+├── app
+│   ├── Controllers
+│   │   └── Http
+│   │       ├── Admin
+│   │       │   ├── PlantsController.ts
+│   │       │   └── UsersController.ts
+│   │       ├── CartsController.ts
+│   │       ├── OrdersController.ts
+│   │       ├── PlantsController.ts
+│   │       ├── RegistrationsController.ts
+│   │       ├── SessionsController.ts
+│   │       └── UsersController.ts
+│   ├── controllers_summary.js
+│   ├── Exceptions
+│   │   └── Handler.ts
+│   ├── Middleware
+│   │   ├── Auth.ts
+│   │   └── SilentAuth.ts
+│   ├── Models
+│   │   ├── OrderItem.ts
+│   │   ├── Order.ts
+│   │   ├── Plant.ts
+│   │   └── User.ts
+│   ├── models_summary.js
+│   └── services_summary.js
+├── commands
+│   └── index.ts
+├── config
+│   ├── app.ts
+│   ├── auth.ts
+│   ├── bodyparser.ts
+│   ├── cors.ts
+│   ├── database.ts
+│   ├── drive.ts
+│   ├── hash.ts
+│   ├── session.ts
+│   ├── shield.ts
+│   └── static.ts
+├── contracts
+│   ├── auth.ts
+│   ├── drive.ts
+│   ├── env.ts
+│   ├── events.ts
+│   ├── hash.ts
+│   └── tests.ts
+├── database
+│   ├── factories
+│   │   └── index.ts
+│   ├── migrations
+│   │   └── 1748636688321_create_tables.ts
+│   └── seeders
+│       └── Seed.ts
+├── env.ts
+├── package.json
+├── package-lock.json
+├── projet.txt
+├── providers
+│   └── AppProvider.ts
+├── public
+│   └── favicon.ico
+├── resources
+│   ├── views
+│   │   ├── admin
+│   │   │   ├── plants
+│   │   │   │   ├── edit.edge
+│   │   │   │   ├── _form.edge
+│   │   │   │   ├── index.edge
+│   │   │   │   └── new.edge
+│   │   │   └── users
+│   │   │       ├── edit.edge
+│   │   │       ├── index.edge
+│   │   │       └── show.edge
+│   │   ├── errors
+│   │   │   ├── not-found.edge
+│   │   │   ├── server-error.edge
+│   │   │   └── unauthorized.edge
+│   │   ├── layouts
+│   │   │   ├── application.edge
+│   │   │   ├── _flash_messages.edge
+│   │   │   └── _navbar.edge
+│   │   ├── orders
+│   │   │   ├── create.edge
+│   │   │   ├── index.edge
+│   │   │   ├── new.edge
+│   │   │   └── _order_card.edge
+│   │   ├── plants
+│   │   │   ├── edit.edge
+│   │   │   ├── index.edge
+│   │   │   └── show.edge
+│   │   ├── sessions
+│   │   │   └── new.edge
+│   │   └── users
+│   │       ├── edit.edge
+│   │       └── show.edge
+│   └── views_summary.js
+├── server.ts
+├── start
+│   ├── kernel.ts
+│   └── routes.ts
+├── tests
+│   ├── bootstrap.ts
+│   └── functional
+│       └── hello_world.spec.ts
+├── test.ts
+├── tsconfig.json
+└── users.txt
+
+31 directories, 78 files
+
+# CONFIG
+#
+## package.json
+
+{
+  "name": "plant_shop_adonisJS",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node ace serve --watch",
+    "build": "node ace build --production",
+    "start": "node server.js",
+    "test": "node ace test"
+  },
+  "devDependencies": {
+    "@adonisjs/assembler": "^5.9.6",
+    "@japa/runner": "^2.5.1",
+    "@types/proxy-addr": "^2.0.3",
+    "@types/source-map-support": "^0.5.10",
+    "adonis-preset-ts": "^2.1.0",
+    "pino-pretty": "^10.2.0",
+    "typescript": "~4.6",
+    "youch": "^3.3.4",
+    "youch-terminal": "^2.2.3"
+  },
+  "dependencies": {
+    "@adonisjs/auth": "^8.2.3",
+    "@adonisjs/core": "^5.9.0",
+    "@adonisjs/lucid": "^18.4.2",
+    "@adonisjs/repl": "^3.1.11",
+    "@adonisjs/session": "^6.4.0",
+    "@adonisjs/shield": "^7.1.1",
+    "@adonisjs/view": "^6.2.0",
+    "luxon": "^3.4.4",
+    "pg": "^8.16.0",
+    "proxy-addr": "^2.0.7",
+    "reflect-metadata": "^0.1.13",
+    "source-map-support": "^0.5.21",
+    "sqlite3": "^5.1.7"
+  }
+}
+
+
+## .adonisrc.json
+
+{
+  "typescript": true,
+  "commands": [
+    "./commands",
+    "@adonisjs/core/build/commands/index.js",
+    "@adonisjs/repl/build/commands",
+    "@adonisjs/lucid/build/commands"
+  ],
+  "exceptionHandlerNamespace": "App/Exceptions/Handler",
+  "aliases": {
+    "App": "app",
+    "Config": "config",
+    "Database": "database",
+    "Contracts": "contracts"
+  },
+  "preloads": [
+    "./start/routes",
+    "./start/kernel"
+  ],
+  "providers": [
+    "./providers/AppProvider",
+    "@adonisjs/core",
+    "@adonisjs/session",
+    "@adonisjs/view",
+    "@adonisjs/shield",
+    "@adonisjs/lucid",
+    "@adonisjs/auth"
+  ],
+  "metaFiles": [
+    {
+      "pattern": "public/**",
+      "reloadServer": false
+    },
+    {
+      "pattern": "resources/views/**/*.edge",
+      "reloadServer": false
+    }
+  ],
+  "aceProviders": [
+    "@adonisjs/repl"
+  ],
+  "tests": {
+    "suites": [
+      {
+        "name": "functional",
+        "files": [
+          "tests/functional/**/*.spec(.ts|.js)"
+        ],
+        "timeout": 60000
+      }
+    ]
+  },
+  "testProviders": [
+    "@japa/preset-adonis/TestsProvider"
+  ]
+}
+
+## ace-manifest.json
+
+{
+  "commands": {
+    "dump:rcfile": {
+      "settings": {},
+      "commandPath": "@adonisjs/core/build/commands/DumpRc",
+      "commandName": "dump:rcfile",
+      "description": "Dump contents of .adonisrc.json file along with defaults",
+      "args": [],
+      "aliases": [],
+      "flags": []
+    },
+    "list:routes": {
+      "settings": {
+        "loadApp": true,
+        "stayAlive": true
+      },
+      "commandPath": "@adonisjs/core/build/commands/ListRoutes/index",
+      "commandName": "list:routes",
+      "description": "List application routes",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "verbose",
+          "propertyName": "verbose",
+          "type": "boolean",
+          "description": "Display more information"
+        },
+        {
+          "name": "reverse",
+          "propertyName": "reverse",
+          "type": "boolean",
+          "alias": "r",
+          "description": "Reverse routes display"
+        },
+        {
+          "name": "methods",
+          "propertyName": "methodsFilter",
+          "type": "array",
+          "alias": "m",
+          "description": "Filter routes by method"
+        },
+        {
+          "name": "patterns",
+          "propertyName": "patternsFilter",
+          "type": "array",
+          "alias": "p",
+          "description": "Filter routes by the route pattern"
+        },
+        {
+          "name": "names",
+          "propertyName": "namesFilter",
+          "type": "array",
+          "alias": "n",
+          "description": "Filter routes by route name"
+        },
+        {
+          "name": "json",
+          "propertyName": "json",
+          "type": "boolean",
+          "description": "Output as JSON"
+        },
+        {
+          "name": "table",
+          "propertyName": "table",
+          "type": "boolean",
+          "description": "Output as Table"
+        },
+        {
+          "name": "max-width",
+          "propertyName": "maxWidth",
+          "type": "number",
+          "description": "Specify maximum rendering width. Ignored for JSON Output"
+        }
+      ]
+    },
+    "generate:key": {
+      "settings": {},
+      "commandPath": "@adonisjs/core/build/commands/GenerateKey",
+      "commandName": "generate:key",
+      "description": "Generate a new APP_KEY secret",
+      "args": [],
+      "aliases": [],
+      "flags": []
+    },
+    "repl": {
+      "settings": {
+        "loadApp": true,
+        "environment": "repl",
+        "stayAlive": true
+      },
+      "commandPath": "@adonisjs/repl/build/commands/AdonisRepl",
+      "commandName": "repl",
+      "description": "Start a new REPL session",
+      "args": [],
+      "aliases": [],
+      "flags": []
+    },
+    "db:seed": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/DbSeed",
+      "commandName": "db:seed",
+      "description": "Execute database seeders",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "Define a custom database connection for the seeders",
+          "alias": "c"
+        },
+        {
+          "name": "interactive",
+          "propertyName": "interactive",
+          "type": "boolean",
+          "description": "Run seeders in interactive mode",
+          "alias": "i"
+        },
+        {
+          "name": "files",
+          "propertyName": "files",
+          "type": "array",
+          "description": "Define a custom set of seeders files names to run",
+          "alias": "f"
+        },
+        {
+          "name": "compact-output",
+          "propertyName": "compactOutput",
+          "type": "boolean",
+          "description": "A compact single-line output"
+        }
+      ]
+    },
+    "db:wipe": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/DbWipe",
+      "commandName": "db:wipe",
+      "description": "Drop all tables, views and types in database",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "Define a custom database connection",
+          "alias": "c"
+        },
+        {
+          "name": "drop-views",
+          "propertyName": "dropViews",
+          "type": "boolean",
+          "description": "Drop all views"
+        },
+        {
+          "name": "drop-types",
+          "propertyName": "dropTypes",
+          "type": "boolean",
+          "description": "Drop all custom types (Postgres only)"
+        },
+        {
+          "name": "force",
+          "propertyName": "force",
+          "type": "boolean",
+          "description": "Explicitly force command to run in production"
+        }
+      ]
+    },
+    "db:truncate": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/DbTruncate",
+      "commandName": "db:truncate",
+      "description": "Truncate all tables in database",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "Define a custom database connection",
+          "alias": "c"
+        },
+        {
+          "name": "force",
+          "propertyName": "force",
+          "type": "boolean",
+          "description": "Explicitly force command to run in production"
+        }
+      ]
+    },
+    "make:model": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/MakeModel",
+      "commandName": "make:model",
+      "description": "Make a new Lucid model",
+      "args": [
+        {
+          "type": "string",
+          "propertyName": "name",
+          "name": "name",
+          "required": true,
+          "description": "Name of the model class"
+        }
+      ],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "migration",
+          "propertyName": "migration",
+          "type": "boolean",
+          "alias": "m",
+          "description": "Generate the migration for the model"
+        },
+        {
+          "name": "controller",
+          "propertyName": "controller",
+          "type": "boolean",
+          "alias": "c",
+          "description": "Generate the controller for the model"
+        },
+        {
+          "name": "factory",
+          "propertyName": "factory",
+          "type": "boolean",
+          "alias": "f",
+          "description": "Generate a factory for the model"
+        }
+      ]
+    },
+    "make:migration": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/MakeMigration",
+      "commandName": "make:migration",
+      "description": "Make a new migration file",
+      "args": [
+        {
+          "type": "string",
+          "propertyName": "name",
+          "name": "name",
+          "required": true,
+          "description": "Name of the migration file"
+        }
+      ],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "The connection flag is used to lookup the directory for the migration file"
+        },
+        {
+          "name": "folder",
+          "propertyName": "folder",
+          "type": "string",
+          "description": "Pre-select a migration directory"
+        },
+        {
+          "name": "create",
+          "propertyName": "create",
+          "type": "string",
+          "description": "Define the table name for creating a new table"
+        },
+        {
+          "name": "table",
+          "propertyName": "table",
+          "type": "string",
+          "description": "Define the table name for altering an existing table"
+        }
+      ]
+    },
+    "make:seeder": {
+      "settings": {},
+      "commandPath": "@adonisjs/lucid/build/commands/MakeSeeder",
+      "commandName": "make:seeder",
+      "description": "Make a new Seeder file",
+      "args": [
+        {
+          "type": "string",
+          "propertyName": "name",
+          "name": "name",
+          "required": true,
+          "description": "Name of the seeder class"
+        }
+      ],
+      "aliases": [],
+      "flags": []
+    },
+    "make:factory": {
+      "settings": {},
+      "commandPath": "@adonisjs/lucid/build/commands/MakeFactory",
+      "commandName": "make:factory",
+      "description": "Make a new factory",
+      "args": [
+        {
+          "type": "string",
+          "propertyName": "model",
+          "name": "model",
+          "required": true,
+          "description": "The name of the model"
+        }
+      ],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "model-path",
+          "propertyName": "modelPath",
+          "type": "string",
+          "description": "The path to the model"
+        },
+        {
+          "name": "exact",
+          "propertyName": "exact",
+          "type": "boolean",
+          "description": "Create the factory with the exact name as provided",
+          "alias": "e"
+        }
+      ]
+    },
+    "migration:run": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/Migration/Run",
+      "commandName": "migration:run",
+      "description": "Migrate database by running pending migrations",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "Define a custom database connection",
+          "alias": "c"
+        },
+        {
+          "name": "force",
+          "propertyName": "force",
+          "type": "boolean",
+          "description": "Explicitly force to run migrations in production"
+        },
+        {
+          "name": "dry-run",
+          "propertyName": "dryRun",
+          "type": "boolean",
+          "description": "Do not run actual queries. Instead view the SQL output"
+        },
+        {
+          "name": "compact-output",
+          "propertyName": "compactOutput",
+          "type": "boolean",
+          "description": "A compact single-line output"
+        },
+        {
+          "name": "disable-locks",
+          "propertyName": "disableLocks",
+          "type": "boolean",
+          "description": "Disable locks acquired to run migrations safely"
+        }
+      ]
+    },
+    "migration:rollback": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/Migration/Rollback",
+      "commandName": "migration:rollback",
+      "description": "Rollback migrations to a specific batch number",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "Define a custom database connection",
+          "alias": "c"
+        },
+        {
+          "name": "force",
+          "propertyName": "force",
+          "type": "boolean",
+          "description": "Explictly force to run migrations in production"
+        },
+        {
+          "name": "dry-run",
+          "propertyName": "dryRun",
+          "type": "boolean",
+          "description": "Do not run actual queries. Instead view the SQL output"
+        },
+        {
+          "name": "batch",
+          "propertyName": "batch",
+          "type": "number",
+          "description": "Define custom batch number for rollback. Use 0 to rollback to initial state"
+        },
+        {
+          "name": "compact-output",
+          "propertyName": "compactOutput",
+          "type": "boolean",
+          "description": "A compact single-line output"
+        },
+        {
+          "name": "disable-locks",
+          "propertyName": "disableLocks",
+          "type": "boolean",
+          "description": "Disable locks acquired to run migrations safely"
+        }
+      ]
+    },
+    "migration:status": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/Migration/Status",
+      "commandName": "migration:status",
+      "description": "View migrations status",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "Define a custom database connection",
+          "alias": "c"
+        }
+      ]
+    },
+    "migration:reset": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/Migration/Reset",
+      "commandName": "migration:reset",
+      "description": "Rollback all migrations",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "Define a custom database connection",
+          "alias": "c"
+        },
+        {
+          "name": "force",
+          "propertyName": "force",
+          "type": "boolean",
+          "description": "Explicitly force command to run in production"
+        },
+        {
+          "name": "dry-run",
+          "propertyName": "dryRun",
+          "type": "boolean",
+          "description": "Do not run actual queries. Instead view the SQL output"
+        },
+        {
+          "name": "disable-locks",
+          "propertyName": "disableLocks",
+          "type": "boolean",
+          "description": "Disable locks acquired to run migrations safely"
+        }
+      ]
+    },
+    "migration:refresh": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/Migration/Refresh",
+      "commandName": "migration:refresh",
+      "description": "Rollback and migrate database",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "Define a custom database connection",
+          "alias": "c"
+        },
+        {
+          "name": "force",
+          "propertyName": "force",
+          "type": "boolean",
+          "description": "Explicitly force command to run in production"
+        },
+        {
+          "name": "dry-run",
+          "propertyName": "dryRun",
+          "type": "boolean",
+          "description": "Do not run actual queries. Instead view the SQL output"
+        },
+        {
+          "name": "seed",
+          "propertyName": "seed",
+          "type": "boolean",
+          "description": "Run seeders"
+        },
+        {
+          "name": "disable-locks",
+          "propertyName": "disableLocks",
+          "type": "boolean",
+          "description": "Disable locks acquired to run migrations safely"
+        }
+      ]
+    },
+    "migration:fresh": {
+      "settings": {
+        "loadApp": true
+      },
+      "commandPath": "@adonisjs/lucid/build/commands/Migration/Fresh",
+      "commandName": "migration:fresh",
+      "description": "Drop all tables and re-migrate the database",
+      "args": [],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "connection",
+          "propertyName": "connection",
+          "type": "string",
+          "description": "Define a custom database connection",
+          "alias": "c"
+        },
+        {
+          "name": "force",
+          "propertyName": "force",
+          "type": "boolean",
+          "description": "Explicitly force command to run in production"
+        },
+        {
+          "name": "seed",
+          "propertyName": "seed",
+          "type": "boolean",
+          "description": "Run seeders"
+        },
+        {
+          "name": "drop-views",
+          "propertyName": "dropViews",
+          "type": "boolean",
+          "description": "Drop all views"
+        },
+        {
+          "name": "drop-types",
+          "propertyName": "dropTypes",
+          "type": "boolean",
+          "description": "Drop all custom types (Postgres only)"
+        },
+        {
+          "name": "disable-locks",
+          "propertyName": "disableLocks",
+          "type": "boolean",
+          "description": "Disable locks acquired to run migrations safely"
+        }
+      ]
+    }
+  },
+  "aliases": {}
+}
+
+
+## tsconfig.json
+
+{
+  "extends": "adonis-preset-ts/tsconfig.json",
+  "include": [
+    "**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ],
+  "compilerOptions": {
+    "outDir": "build",
+    "rootDir": "./",
+    "baseUrl": "./",
+    "sourceMap": true,
+    "paths": {
+      "App/*": [
+        "./app/*"
+      ],
+      "Config/*": [
+        "./config/*"
+      ],
+      "Contracts/*": [
+        "./contracts/*"
+      ],
+      "Database/*": [
+        "./database/*"
+      ]
+    },
+    "types": [
+      "@adonisjs/core",
+      "@adonisjs/repl",
+      "@adonisjs/session",
+      "@adonisjs/view",
+      "@adonisjs/shield",
+      "@japa/preset-adonis/build/adonis-typings",
+      "@adonisjs/lucid",
+      "@adonisjs/auth"
+    ]
+  }
+}
+
+## server.ts
+
+/*
+|--------------------------------------------------------------------------
+| AdonisJs Server
+|--------------------------------------------------------------------------
+|
+| The contents in this file is meant to bootstrap the AdonisJs application
+| and start the HTTP server to accept incoming connections. You must avoid
+| making this file dirty and instead make use of `lifecycle hooks` provided
+| by AdonisJs service providers for custom code.
+|
+*/
+
+import 'reflect-metadata'
+import sourceMapSupport from 'source-map-support'
+import { Ignitor } from '@adonisjs/core/build/standalone'
+
+sourceMapSupport.install({ handleUncaughtExceptions: false })
+
+new Ignitor(__dirname)
+  .httpServer()
+  .start()
+
+
+## env.ts
+
+/*
+|--------------------------------------------------------------------------
+| Validating Environment Variables
+|--------------------------------------------------------------------------
+|
+| In this file we define the rules for validating environment variables.
+| By performing validation we ensure that your application is running in
+| a stable environment with correct configuration values.
+|
+| This file is read automatically by the framework during the boot lifecycle
+| and hence do not rename or move this file to a different location.
+|
+*/
+
+import Env from '@ioc:Adonis/Core/Env'
+
+export default Env.rules({
+	HOST: Env.schema.string({ format: 'host' }),
+	PORT: Env.schema.number(),
+	APP_KEY: Env.schema.string(),
+	APP_NAME: Env.schema.string(),
+	CACHE_VIEWS: Env.schema.boolean(),
+	SESSION_DRIVER: Env.schema.string(),
+  DRIVE_DISK: Env.schema.enum(['local'] as const),
+	NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
+})
+
+
+## .env.example
+
+PORT=3333
+HOST=0.0.0.0
+NODE_ENV=development
+APP_KEY=Ksl8UwT0GmUe1MMe83SlhR9ip2twA4tf
+DRIVE_DISK=local
+SESSION_DRIVER=cookie
+CACHE_VIEWS=false
+DB_CONNECTION=sqlite
+PG_HOST=127.0.0.1
+PG_PORT=5432
+PG_USER=lucid
+PG_PASSWORD=
+PG_DB_NAME=lucid
+
+
+
+# CONTROLEURS
+#
+## app/Controllers/Http/RegistrationsController.ts
+
+// app/Controllers/Http/RegistrationsController.ts
+
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import User from 'App/Models/User'
+import Hash from '@ioc:Adonis/Core/Hash'
+
+/**
+ * Contrôleur d'inscription (register)
+ */
+export default class RegistrationsController {
+	/**
+	 * Affiche le formulaire d'inscription
+	 */
+	public async showRegisterForm({ view }: HttpContextContract) {
+		return view.render('registrations/register')
+	}
+
+	/**
+	 * Création du compte utilisateur
+	 */
+	public async register({ request, response, session, auth }: HttpContextContract) {
+		const data = request.only(['name', 'email', 'password'])
+		const utilisateur = new User()
+		utilisateur.name = data.name
+		utilisateur.email = data.email
+		utilisateur.password = await Hash.make(data.password)
+		await utilisateur.save()
+		await auth.login(utilisateur)
+		session.flash({ notification: 'Compte créé.' })
+		return response.redirect().toRoute('plants.index')
+	}
+}
+
+
+## app/Controllers/Http/OrdersController.ts
+
+// app/Controllers/Http/OrdersController.ts
+
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Order from 'App/Models/Order'
+import Plant from 'App/Models/Plant'
+import OrderItem from 'App/Models/OrderItem'
+
+/**
+ * Contrôleur des commandes
+ */
+export default class OrdersController {
+	/**
+	 * Liste des commandes utilisateur
+	 */
+	public async index({ auth, view }: HttpContextContract) {
+		const commandes = await Order.query()
+			.where('user_id', auth.user!.id)
+			.preload('orderItems', (query) => query.preload('plant'))
+			.orderBy('created_at', 'desc')
+		return view.render('orders/index', { commandes })
+	}
+
+	/**
+	 * Page de confirmation commande (panier, logique JS côté client)
+	 */
+	public async new({ view }: HttpContextContract) {
+		return view.render('orders/new')
+	}
+
+	/**
+	 * Création de la commande (vérif stock, MAJ, gestion transaction)
+	 */
+	public async create({ request, auth, response, session }: HttpContextContract) {
+		const items = JSON.parse(request.input('order.items', '[]'))
+		let total = 0
+
+		const trx = await Order.db.transaction()
+		try {
+			const commande = await Order.create({
+				userId: auth.user!.id,
+				status: 'confirmed',
+				totalPrice: 0
+			}, { client: trx })
+
+			for (const item of items) {
+				const plante = await Plant.findOrFail(item.plant_id, { client: trx })
+				const quantite = parseInt(item.quantity)
+				if (plante.stock < quantite) {
+					throw new Error(`Stock insuffisant pour ${plante.name}`)
+				}
+				total += plante.price * quantite
+				plante.stock -= quantite
+				await plante.save({ client: trx })
+				await OrderItem.create({
+					orderId: commande.id,
+					plantId: plante.id,
+					quantity: quantite
+				}, { client: trx })
+			}
+			commande.totalPrice = total
+			await commande.save()
+			await trx.commit()
+
+			session.flash({ notification: 'Commande confirmée.' })
+			return response.redirect().toRoute('orders.index')
+		} catch (erreur) {
+			await trx.rollback()
+			session.flash({ error: erreur.message || "Erreur lors de la commande." })
+			return response.redirect().toRoute('orders.new')
+		}
+	}
+}
+
+
+## app/Controllers/Http/Admin/UsersController.ts
+
+// app/Controllers/Http/Admin/UsersController.ts
+
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import User from 'App/Models/User'
+
+/**
+ * Contrôleur d’administration des utilisateurs
+ */
+export default class UsersController {
+	/**
+	 * Liste tous les utilisateurs
+	 */
+	public async index({ view }: HttpContextContract) {
+		const utilisateurs = await User.all()
+		return view.render('admin/users/index', { utilisateurs })
+	}
+
+	/**
+	 * Affiche le détail d’un utilisateur
+	 */
+	public async show({ params, view }: HttpContextContract) {
+		const utilisateur = await User.findOrFail(params.id)
+		return view.render('admin/users/show', { utilisateur })
+	}
+
+	/**
+	 * Formulaire édition utilisateur
+	 */
+	public async edit({ params, view }: HttpContextContract) {
+		const utilisateur = await User.findOrFail(params.id)
+		return view.render('admin/users/edit', { utilisateur })
+	}
+
+	/**
+	 * MAJ utilisateur
+	 */
+	public async update({ params, request, response, session }: HttpContextContract) {
+		const utilisateur = await User.findOrFail(params.id)
+		utilisateur.merge(request.only(['name', 'email', 'admin']))
+		await utilisateur.save()
+		session.flash({ notification: 'Utilisateur mis à jour.' })
+		return response.redirect().toRoute('admin.users.index')
+	}
+
+	/**
+	 * Suppression utilisateur
+	 */
+	public async destroy({ params, response, session }: HttpContextContract) {
+		const utilisateur = await User.findOrFail(params.id)
+		await utilisateur.delete()
+		session.flash({ notification: 'Utilisateur supprimé.' })
+		return response.redirect().toRoute('admin.users.index')
+	}
+}
+
+
+## app/Controllers/Http/Admin/PlantsController.ts
+
+// app/Controllers/Http/Admin/PlantsController.ts
+
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Plant from 'App/Models/Plant'
+
+/**
+ * Contrôleur d’administration des plantes
+ */
+export default class PlantsController {
+	/**
+	 * Liste toutes les plantes (admin)
+	 */
+	public async index({ view }: HttpContextContract) {
+		const plantes = await Plant.all()
+		return view.render('admin/plants/index', { plantes })
+	}
+
+	/**
+	 * Formulaire création plante
+	 */
+	public async create({ view }: HttpContextContract) {
+		return view.render('admin/plants/create')
+	}
+
+	/**
+	 * Création plante
+	 */
+	public async store({ request, response, session }: HttpContextContract) {
+		const data = request.only(['name', 'price', 'description', 'stock'])
+		await Plant.create(data)
+		session.flash({ notification: 'Plante créée.' })
+		return response.redirect().toRoute('admin.plants.index')
+	}
+
+	/**
+	 * Formulaire édition plante
+	 */
+	public async edit({ params, view }: HttpContextContract) {
+		const plante = await Plant.findOrFail(params.id)
+		return view.render('admin/plants/edit', { plante })
+	}
+
+	/**
+	 * MAJ plante
+	 */
+	public async update({ params, request, response, session }: HttpContextContract) {
+		const plante = await Plant.findOrFail(params.id)
+		plante.merge(request.only(['name', 'price', 'description', 'stock']))
+		await plante.save()
+		session.flash({ notification: 'Plante modifiée.' })
+		return response.redirect().toRoute('admin.plants.index')
+	}
+
+	/**
+	 * Suppression plante
+	 */
+	public async destroy({ params, response, session }: HttpContextContract) {
+		const plante = await Plant.findOrFail(params.id)
+		await plante.delete()
+		session.flash({ notification: 'Plante supprimée.' })
+		return response.redirect().toRoute('admin.plants.index')
+	}
+}
+
+
+## app/Controllers/Http/SessionsController.ts
+
+// app/Controllers/Http/SessionsController.ts
+
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import User from 'App/Models/User'
+import Hash from '@ioc:Adonis/Core/Hash'
+
+/**
+ * Contrôleur de session (login/logout)
+ */
+export default class SessionsController {
+	/**
+	 * Affiche le formulaire de connexion
+	 */
+	public async showLoginForm({ view }: HttpContextContract) {
+		return view.render('sessions/login')
+	}
+
+	/**
+	 * Connexion utilisateur
+	 */
+	public async login({ request, response, auth, session }: HttpContextContract) {
+		const { email, password } = request.only(['email', 'password'])
+		const user = await User.query().where('email', email).first()
+		if (!user || !(await Hash.verify(user.password, password))) {
+			session.flash({ error: 'Identifiants invalides.' })
+			return response.redirect().toRoute('login')
+		}
+		await auth.login(user)
+		return response.redirect().toRoute('plants.index')
+	}
+
+	/**
+	 * Déconnexion
+	 */
+	public async logout({ auth, response }: HttpContextContract) {
+		await auth.logout()
+		return response.redirect().toRoute('login')
+	}
+}
+
+
+## app/Controllers/Http/CartsController.ts
+
+// app/Controllers/Http/CartsController.ts
+
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+
+/**
+ * Contrôleur du panier (affichage seulement, logique JS côté client)
+ */
+export default class CartsController {
+	/**
+	 * Affiche la page panier
+	 */
+	public async index({ view }: HttpContextContract) {
+		return view.render('carts/index')
+	}
+}
+
+
+## app/Controllers/Http/UsersController.ts
+
+// app/Controllers/Http/UsersController.ts
+
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import User from 'App/Models/User'
+
+/**
+ * Contrôleur des utilisateurs (profil personnel)
+ */
+export default class UsersController {
+	/**
+	 * Affiche le profil utilisateur
+	 */
+	public async show({ params, auth, response, view }: HttpContextContract) {
+		const utilisateur = await User.findOrFail(params.id)
+		// Autorisation : à adapter selon votre logique
+		if (auth.user?.id !== utilisateur.id) {
+			return response.unauthorized('Accès interdit.')
+		}
+		return view.render('users/show', { utilisateur })
+	}
+
+	/**
+	 * Formulaire édition profil utilisateur
+	 */
+	public async edit({ params, auth, response, view }: HttpContextContract) {
+		const utilisateur = await User.findOrFail(params.id)
+		if (auth.user?.id !== utilisateur.id) {
+			return response.unauthorized('Accès interdit.')
+		}
+		return view.render('users/edit', { utilisateur })
+	}
+
+	/**
+	 * Met à jour le profil utilisateur
+	 */
+	public async update({ params, request, auth, response, session }: HttpContextContract) {
+		const utilisateur = await User.findOrFail(params.id)
+		if (auth.user?.id !== utilisateur.id) {
+			return response.unauthorized('Accès interdit.')
+		}
+		utilisateur.merge(request.only(['name', 'email']))
+		await utilisateur.save()
+		session.flash({ notification: 'Profil mis à jour.' })
+		return response.redirect().toRoute('users.show', { id: utilisateur.id })
+	}
+}
+
+
+## app/Controllers/Http/PlantsController.ts
+
+// app/Controllers/Http/PlantsController.ts
+
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Plant from 'App/Models/Plant'
+
+/**
+ * Contrôleur public des plantes
+ */
+export default class PlantsController {
+	/**
+	 * Liste des plantes en stock (stock >= 1)
+	 */
+	public async index({ view }: HttpContextContract) {
+		const plantes = await Plant.query().where('stock', '>=', 1).orderBy('name', 'asc')
+		return view.render('plants/index', { plantes })
+	}
+
+	/**
+	 * Affiche une plante
+	 */
+	public async show({ params, view }: HttpContextContract) {
+		const plante = await Plant.findOrFail(params.id)
+		return view.render('plants/show', { plante })
+	}
+}
+
+
+
+# MODELES
+#
+## app/Models/User.ts
+
+import { DateTime } from 'luxon'
+import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import Order from './Order'
+
+export default class User extends BaseModel {
+	@column({ isPrimary: true })
+	public id: number
+
+	@column()
+	public email: string
+
+	@column()
+	public password: string
+
+	@column()
+	public admin: boolean
+
+	@column()
+	public name: string
+
+	@column.dateTime({ autoCreate: true })
+	public createdAt: DateTime
+
+	@column.dateTime({ autoCreate: true, autoUpdate: true })
+	public updatedAt: DateTime
+
+	@hasMany(() => Order)
+	public orders: HasMany<typeof Order>
+}
+
+
+## app/Models/Order.ts
+
+import { DateTime } from 'luxon'
+import { BaseModel, column, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import User from './User'
+import OrderItem from './OrderItem'
+
+export default class Order extends BaseModel {
+	@column({ isPrimary: true })
+	public id: number
+
+	@column()
+	public userId: number
+
+	@column()
+	public totalPrice: number
+
+	@column()
+	public status: string
+
+	@column.dateTime({ autoCreate: true })
+	public createdAt: DateTime
+
+	@column.dateTime({ autoCreate: true, autoUpdate: true })
+	public updatedAt: DateTime
+
+	@belongsTo(() => User)
+	public user: BelongsTo<typeof User>
+
+	@hasMany(() => OrderItem)
+	public orderItems: HasMany<typeof OrderItem>
+}
+
+
+## app/Models/OrderItem.ts
+
+import { DateTime } from 'luxon'
+import { BaseModel, column, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
+import Order from './Order'
+import Plant from './Plant'
+
+export default class OrderItem extends BaseModel {
+	@column({ isPrimary: true })
+	public id: number
+
+	@column()
+	public orderId: number
+
+	@column()
+	public plantId: number
+
+	@column()
+	public quantity: number
+
+	@column.dateTime({ autoCreate: true })
+	public createdAt: DateTime
+
+	@column.dateTime({ autoCreate: true, autoUpdate: true })
+	public updatedAt: DateTime
+
+	@belongsTo(() => Order)
+	public order: BelongsTo<typeof Order>
+
+	@belongsTo(() => Plant)
+	public plant: BelongsTo<typeof Plant>
+}
+
+
+## app/Models/Plant.ts
+
+import { DateTime } from 'luxon'
+import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import OrderItem from './OrderItem'
+
+export default class Plant extends BaseModel {
+	@column({ isPrimary: true })
+	public id: number
+
+	@column()
+	public name: string
+
+	@column()
+	public price: number
+
+	@column()
+	public description: string
+
+	@column()
+	public stock: number
+
+	@column.dateTime({ autoCreate: true })
+	public createdAt: DateTime
+
+	@column.dateTime({ autoCreate: true, autoUpdate: true })
+	public updatedAt: DateTime
+
+	@hasMany(() => OrderItem)
+	public orderItems: HasMany<typeof OrderItem>
+}
+
+
+
+# ROUTES
+#
+## start/routes.ts
+
+/**
+ * start/routes.ts
+ *
+ * Here you can register HTTP routes for your application.
+ * While building, ensure you include the import below.
+ */
+
+import Route from '@ioc:Adonis/Core/Route'
+
+/*
+|--------------------------------------------------------------------------
+| Routes
+|--------------------------------------------------------------------------
+*/
+
+// Authentification
+Route.get('/login', 'SessionsController.showLoginForm').as('login.show')
+Route.post('/login', 'SessionsController.login').as('login.perform')
+Route.post('/logout', 'SessionsController.logout').as('logout')
+
+// Inscription
+Route.get('/register', 'RegistrationsController.showRegisterForm').as('register.show')
+Route.post('/register', 'RegistrationsController.register').as('register.perform')
+
+// Profil personnel
+Route.resource('users', 'UsersController')
+  .only(['show', 'edit', 'update'])
+
+// Plantes (public)
+Route.resource('plants', 'PlantsController')
+  .only(['index', 'show'])
+
+// Panier
+Route.resource('carts', 'CartsController')
+  .only(['index', 'create', 'destroy'])
+
+// Commandes
+Route.resource('orders', 'OrdersController')
+  .only(['index', 'create'])
+
+// Administration
+Route.group(() => {
+  Route.resource('plants', 'Admin/PlantsController')
+    .except(['show'])
+  Route.resource('users', 'Admin/UsersController')
+    .only(['index', 'show', 'edit', 'update', 'destroy'])
+})
+  .prefix('/admin')
+  .as('admin')
+
+// Page d’accueil
+Route.get('/', 'PlantsController.index').as('home')
+
+
+## start/kernel.ts
+
+/*
+|--------------------------------------------------------------------------
+| Application middleware
+|--------------------------------------------------------------------------
+|
+| This file is used to define middleware for HTTP requests. You can register
+| middleware as a `closure` or an IoC container binding. The bindings are
+| preferred, since they keep this file clean.
+|
+*/
+
+import Server from '@ioc:Adonis/Core/Server'
+
+/*
+|--------------------------------------------------------------------------
+| Global middleware
+|--------------------------------------------------------------------------
+|
+| An array of global middleware, that will be executed in the order they
+| are defined for every HTTP requests.
+|
+*/
+Server.middleware.register([
+  () => import('@ioc:Adonis/Core/BodyParser'),
+])
+
+/*
+|--------------------------------------------------------------------------
+| Named middleware
+|--------------------------------------------------------------------------
+|
+| Named middleware are defined as key-value pair. The value is the namespace
+| or middleware function and key is the alias. Later you can use these
+| alias on individual routes. For example:
+|
+| { auth: () => import('App/Middleware/Auth') }
+|
+| and then use it as follows
+|
+| Route.get('dashboard', 'UserController.dashboard').middleware('auth')
+|
+*/
+Server.middleware.registerNamed({
+})
+
+
+
+# MIDDLEWARE
+#
+## app/Middleware/SilentAuth.ts
+
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+
+/**
+ * Silent auth middleware can be used as a global middleware to silent check
+ * if the user is logged-in or not.
+ *
+ * The request continues as usual, even when the user is not logged-in.
+ */
+export default class SilentAuthMiddleware {
+  /**
+   * Handle request
+   */
+  public async handle({ auth }: HttpContextContract, next: () => Promise<void>) {
+    /**
+     * Check if user is logged-in or not. If yes, then `ctx.auth.user` will be
+     * set to the instance of the currently logged in user.
+     */
+    await auth.check()
+    await next()
+  }
+}
+
+
+## app/Middleware/Auth.ts
+
+import { AuthenticationException } from '@adonisjs/auth/build/standalone'
+import type { GuardsList } from '@ioc:Adonis/Addons/Auth'
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+
+/**
+ * Auth middleware is meant to restrict un-authenticated access to a given route
+ * or a group of routes.
+ *
+ * You must register this middleware inside `start/kernel.ts` file under the list
+ * of named middleware.
+ */
+export default class AuthMiddleware {
+  /**
+   * The URL to redirect to when request is Unauthorized
+   */
+  protected redirectTo = '/login'
+
+  /**
+   * Authenticates the current HTTP request against a custom set of defined
+   * guards.
+   *
+   * The authentication loop stops as soon as the user is authenticated using any
+   * of the mentioned guards and that guard will be used by the rest of the code
+   * during the current request.
+   */
+  protected async authenticate(auth: HttpContextContract['auth'], guards: (keyof GuardsList)[]) {
+    /**
+     * Hold reference to the guard last attempted within the for loop. We pass
+     * the reference of the guard to the "AuthenticationException", so that
+     * it can decide the correct response behavior based upon the guard
+     * driver
+     */
+    let guardLastAttempted: string | undefined
+
+    for (let guard of guards) {
+      guardLastAttempted = guard
+
+      if (await auth.use(guard).check()) {
+        /**
+         * Instruct auth to use the given guard as the default guard for
+         * the rest of the request, since the user authenticated
+         * succeeded here
+         */
+        auth.defaultGuard = guard
+        return true
+      }
+    }
+
+    /**
+     * Unable to authenticate using any guard
+     */
+    throw new AuthenticationException(
+      'Unauthorized access',
+      'E_UNAUTHORIZED_ACCESS',
+      guardLastAttempted,
+      this.redirectTo,
+    )
+  }
+
+  /**
+   * Handle request
+   */
+  public async handle (
+    { auth }: HttpContextContract,
+    next: () => Promise<void>,
+    customGuards: (keyof GuardsList)[]
+  ) {
+    /**
+     * Uses the user defined guards or the default guard mentioned in
+     * the config file
+     */
+    const guards = customGuards.length ? customGuards : [auth.name]
+    await this.authenticate(auth, guards)
+    await next()
+  }
+}
+
+
+
+# MIGRATIONS
+#
+## database/migrations/1748636688321_create_tables.ts
+
+import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+
+export default class extends BaseSchema {
+	async up () {
+		this.schema.createTable('users', (table) => {
+			table.increments('id')
+			table.string('email').notNullable().unique()
+			table.string('password').notNullable()
+			table.boolean('admin').defaultTo(false)
+			table.string('name')
+			table.timestamps(true)
+		})
+
+		this.schema.createTable('plants', (table) => {
+			table.increments('id')
+			table.string('name')
+			table.integer('price')
+			table.text('description')
+			table.integer('stock')
+			table.timestamps(true)
+		})
+
+		this.schema.createTable('orders', (table) => {
+			table.increments('id')
+			table.integer('user_id').unsigned().references('id').inTable('users')
+			table.integer('total_price')
+			table.string('status')
+			table.timestamps(true)
+		})
+
+		this.schema.createTable('order_items', (table) => {
+			table.increments('id')
+			table.integer('order_id').unsigned().references('id').inTable('orders')
+			table.integer('plant_id').unsigned().references('id').inTable('plants')
+			table.integer('quantity')
+			table.timestamps(true)
+		})
+	}
+
+	async down () {
+		this.schema.dropTable('order_items')
+		this.schema.dropTable('orders')
+		this.schema.dropTable('plants')
+		this.schema.dropTable('users')
+	}
+}
+
+
+
+# SEEDERS
+#
+## database/seeders/Seed.ts
+
+// database/seeders/Seed.ts
+
+/**
+	Seed principale du projet PlantShop
+	- NB_ADMINS administrateurs (email : adminX@planteshop.com, password : 'password')
+	- NB_USERS utilisateurs (email/password aléatoires, longueur ≥12)
+	- 30 plantes créées
+	- Génération de commandes (2 plantes par utilisateur)
+	- users.txt mis à jour avec tous les identifiants générés
+*/
+
+import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
+import User from 'App/Models/User'
+import Plant from 'App/Models/Plant'
+import Order from 'App/Models/Order'
+import OrderItem from 'App/Models/OrderItem'
+import * as fs from 'fs'
+import * as path from 'path'
+import { faker } from '@faker-js/faker'
+
+/**
+	Réinitialise toutes les données
+*/
+async function resetData() {
+	await OrderItem.query().delete()
+	await Order.query().delete()
+	await Plant.query().delete()
+	await User.query().delete()
+}
+
+/**
+	Crée les administrateurs
+	@return tableau d'admins (utilisé pour users.txt)
+*/
+async function createAdmins(nombreAdmins: number) {
+	const admins = []
+	for (let index = 0; index < nombreAdmins; index++) {
+		const password = 'password'
+		const admin = await User.create({
+			email: `admin${index + 1}@planteshop.com`,
+			password: password,
+			admin: true,
+			name: faker.person.fullName()
+		})
+		admins.push({ email: admin.email, password })
+	}
+	return admins
+}
+
+/**
+	Crée les utilisateurs
+	@return tableau d'utilisateurs (utilisé pour users.txt)
+*/
+async function createUsers(nombreUsers: number) {
+	const users = []
+	for (let index = 0; index < nombreUsers; index++) {
+		const password = faker.internet.password({ length: 12 })
+		const user = await User.create({
+			email: faker.internet.email(),
+			password: password,
+			admin: false,
+			name: faker.person.fullName()
+		})
+		users.push({ email: user.email, password })
+	}
+	return users
+}
+
+/**
+	Crée les plantes (NB_PLANTES)
+	@return tableau de plantes
+*/
+async function createPlants(nombrePlantes: number) {
+	const nomsPlantes = [
+		"Rose", "Tulipe", "Lavande", "Orchidée", "Basilic", "Menthe", "Pivoine", "Tournesol",
+		"Cactus (Echinopsis)", "Bambou", "Camomille (Matricaria recutita)", "Sauge (Salvia officinalis)",
+		"Romarin (Rosmarinus officinalis)", "Thym (Thymus vulgaris)", "Laurier-rose (Nerium oleander)",
+		"Aloe vera", "Jasmin (Jasminum officinale)", "Hortensia (Hydrangea macrophylla)",
+		"Marguerite (Leucanthemum vulgare)", "Géranium (Pelargonium graveolens)", "Fuchsia (Fuchsia magellanica)",
+		"Anémone (Anemone coronaria)", "Azalée (Rhododendron simsii)", "Chrysanthème (Chrysanthemum morifolium)",
+		"Digitale pourpre (Digitalis purpurea)", "Glaïeul (Gladiolus hortulanus)", "Lys (Lilium candidum)",
+		"Violette (Viola odorata)", "Muguet (Convallaria majalis)", "Iris (Iris germanica)",
+		"Lavandin (Lavandula intermedia)", "Érable du Japon (Acer palmatum)", "Citronnelle (Cymbopogon citratus)",
+		"Pin parasol (Pinus pinea)", "Cyprès (Cupressus sempervirens)", "Olivier (Olea europaea)",
+		"Papyrus (Cyperus papyrus)", "Figuier (Ficus carica)", "Eucalyptus (Eucalyptus globulus)",
+		"Acacia (Acacia dealbata)", "Bégonia (Begonia semperflorens)", "Calathea (Calathea ornata)",
+		"Dieffenbachia (Dieffenbachia seguine)", "Ficus elastica", "Sansevieria (Sansevieria trifasciata)",
+		"Philodendron (Philodendron scandens)", "Yucca (Yucca elephantipes)", "Zamioculcas zamiifolia",
+		"Monstera deliciosa", "Pothos (Epipremnum aureum)", "Agave (Agave americana)", "Cactus raquette (Opuntia ficus-indica)",
+		"Palmier-dattier (Phoenix dactylifera)", "Amaryllis (Hippeastrum hybridum)", "Bleuet (Centaurea cyanus)",
+		"Cœur-de-Marie (Lamprocapnos spectabilis)", "Croton (Codiaeum variegatum)", "Dracaena (Dracaena marginata)",
+		"Hosta (Hosta plantaginea)", "Lierre (Hedera helix)", "Mimosa (Acacia dealbata)"
+	]
+	const plants = []
+	const nomsTaille = nomsPlantes.length
+	for (let index = 0; index < nombrePlantes; index++) {
+		const nomBase = nomsPlantes[index % nomsTaille]
+		const nom = nombrePlantes > nomsTaille ? `${nomBase} ${Math.floor(index / nomsTaille) + 1}` : nomBase
+		const plant = await Plant.create({
+			name: nom,
+			price: faker.number.int({ min: 5, max: 50 }),
+			description: faker.lorem.sentence({ min: 10, max: 14 }),
+			stock: faker.number.int({ min: 5, max: 30 })
+		})
+		plants.push(plant)
+	}
+	return plants
+}
+
+/**
+	Crée les commandes (2 plantes par user)
+*/
+async function createOrders(users, plants) {
+	for (const user of await User.all()) {
+		let total = 0
+		const order = await Order.create({
+			userId: user.id,
+			totalPrice: 0,
+			status: faker.helpers.arrayElement(['confirmed', 'pending', 'shipped', 'delivered'])
+		})
+		for (let i = 0; i < 2; i++) {
+			const plant = plants[Math.floor(Math.random() * plants.length)]
+			const quantity = Math.min(faker.number.int({ min: 1, max: 5 }), plant.stock)
+			if (quantity === 0) continue
+			await OrderItem.create({
+				orderId: order.id,
+				plantId: plant.id,
+				quantity: quantity
+			})
+			total += plant.price * quantity
+			plant.stock = plant.stock - quantity
+			await plant.save()
+		}
+		order.totalPrice = total
+		await order.save()
+	}
+}
+
+/**
+	Écrit les utilisateurs/admins dans users.txt
+*/
+function writeUsersFile(admins, users) {
+	const filePath = path.join(process.cwd(), 'users.txt')
+	let content = 'Administrateurs :\n\n'
+	admins.forEach(admin => { content += `${admin.email} ${admin.password}\n` })
+	content += '\nUtilisateurs :\n\n'
+	users.forEach(user => { content += `${user.email} ${user.password}\n` })
+	fs.writeFileSync(filePath, content, 'utf8')
+}
+
+export default class Seed extends BaseSeeder {
+	public async run() {
+		const NB_ADMINS = 3
+		const NB_USERS = 20
+		const NB_PLANTES = 30
+
+		await resetData()
+		const admins = await createAdmins(NB_ADMINS)
+		const users = await createUsers(NB_USERS)
+		const plants = await createPlants(NB_PLANTES)
+		writeUsersFile(admins, users)
+		await createOrders([...admins, ...users], plants)
+
+		console.log('✅ Seed terminée. Données en base et fichier `users.txt` mis à jour.')
+	}
+}
+
+
+
+# FACTORIES
+#
+## database/factories/index.ts
+
+// import Factory from '@ioc:Adonis/Lucid/Factory'
+
+
+
+# VUES
+#
+## resources/views/sessions/new.edge
+
+@extends('layouts/application')
+
+@section('title', 'Connexion')
+
+@section('content')
+	<h1>Connexion</h1>
+	@if(flashMessages.get('error'))
+		<div class="alert alert-danger">{{ flashMessages.get('error') }}</div>
+	@endif
+	<form method="POST" action="{{ route('SessionsController.login') }}">
+		@csrf
+		<div>
+			<label>Email</label>
+			<input type="email" name="email" required>
+		</div>
+		<div>
+			<label>Mot de passe</label>
+			<input type="password" name="password" required>
+		</div>
+		<button type="submit">Se connecter</button>
+	</form>
+	<a href="{{ route('RegistrationsController.showRegisterForm') }}">Créer un compte</a>
+@endsection
+
+
+## resources/views/admin/plants/edit.edge
+
+@extends('layouts/application')
+
+@section('title', 'Modifier plante')
+
+@section('content')
+	<h1>Modifier la plante</h1>
+	@include('admin/plants/_form', { plant: plant, action: route('Admin/PlantsController.update', { id: plant.id }), method: 'PUT' })
+@endsection
+
+
+## resources/views/admin/plants/new.edge
+
+@extends('layouts/application')
+
+@section('title', 'Nouvelle plante')
+
+@section('content')
+	<h1>Créer une plante</h1>
+	@include('admin/plants/_form', { plant: null, action: route('Admin/PlantsController.store'), method: 'POST' })
+@endsection
+
+
+## resources/views/admin/plants/index.edge
+
+@extends('layouts/application')
+
+@section('title', 'Gestion des plantes')
+
+@section('content')
+	<h1>Plantes (admin)</h1>
+	<a href="{{ route('Admin/PlantsController.create') }}">Nouvelle plante</a>
+	<table>
+		<thead>
+			<tr>
+				<th>Nom</th>
+				<th>Prix</th>
+				<th>Stock</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@each(plant in plants)
+				<tr>
+					<td>{{ plant.name }}</td>
+					<td>{{ plant.price }} €</td>
+					<td>{{ plant.stock }}</td>
+					<td>
+						<a href="{{ route('Admin/PlantsController.edit', { id: plant.id }) }}">Modifier</a>
+						<form method="POST" action="{{ route('Admin/PlantsController.destroy', { id: plant.id }) }}" style="display:inline">
+							@csrf
+							@method('DELETE')
+							<button type="submit" onclick="return confirm('Supprimer cette plante ?')">Supprimer</button>
+						</form>
+					</td>
+				</tr>
+			@endeach
+		</tbody>
+	</table>
+@endsection
+
+
+## resources/views/admin/plants/_form.edge
+
+<form method="POST" action="{{ action }}">
+	@csrf
+	@if(method !== 'POST')
+		@method(method)
+	@endif
+	<div>
+		<label>Nom</label>
+		<input type="text" name="name" value="{{ plant ? plant.name : '' }}" required>
+	</div>
+	<div>
+		<label>Prix (€)</label>
+		<input type="number" name="price" value="{{ plant ? plant.price : '' }}" min="0" step="0.01" required>
+	</div>
+	<div>
+		<label>Description</label>
+		<textarea name="description" required>{{ plant ? plant.description : '' }}</textarea>
+	</div>
+	<div>
+		<label>Stock</label>
+		<input type="number" name="stock" value="{{ plant ? plant.stock : '' }}" min="0" required>
+	</div>
+	<button type="submit">Enregistrer</button>
+</form>
+
+
+## resources/views/admin/users/show.edge
+
+@layout('layouts/application')
+
+@section('content')
+<h1>Détail utilisateur</h1>
+<ul>
+	<li>ID : {{ user.id }}</li>
+	<li>Nom : {{ user.name }}</li>
+	<li>Email : {{ user.email }}</li>
+	<li>Admin : {{ user.admin ? 'Oui' : 'Non' }}</li>
+</ul>
+<a href="{{ route('admin.users.edit', {id: user.id}) }}">Modifier</a>
+@endsection
+
+
+## resources/views/admin/users/edit.edge
+
+@layout('layouts/application')
+
+@section('content')
+<h1>Modifier l’utilisateur</h1>
+<form method="POST" action="{{ route('admin.users.update', {id: user.id}) }}">
+	@csrf
+	<input type="hidden" name="_method" value="PUT">
+	<label>Nom : <input type="text" name="name" value="{{ user.name }}"></label><br>
+	<label>Email : <input type="email" name="email" value="{{ user.email }}"></label><br>
+	<label>Admin : <input type="checkbox" name="admin" {{ user.admin ? 'checked' : '' }}></label><br>
+	<button type="submit">Valider</button>
+</form>
+@endsection
+
+
+## resources/views/admin/users/index.edge
+
+@layout('layouts/application')
+
+@section('content')
+<h1>Liste des utilisateurs</h1>
+<table>
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Nom</th>
+			<th>Email</th>
+			<th>Admin</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		@each(user in users)
+		<tr>
+			<td>{{ user.id }}</td>
+			<td>{{ user.name }}</td>
+			<td>{{ user.email }}</td>
+			<td>{{ user.admin ? 'Oui' : 'Non' }}</td>
+			<td>
+				<a href="{{ route('admin.users.show', {id: user.id}) }}">Afficher</a>
+				<a href="{{ route('admin.users.edit', {id: user.id}) }}">Modifier</a>
+			</td>
+		</tr>
+		@endeach
+	</tbody>
+</table>
+@endsection
+
+
+## resources/views/plants/show.edge
+
+@layout('layouts/application')
+
+@section('content')
+<h1>{{ plant.name }}</h1>
+<p>{{ plant.description }}</p>
+<p>Prix : {{ plant.price }} €</p>
+<p>Stock : {{ plant.stock }}</p>
+@if(auth.user)
+<form method="POST" action="{{ route('carts.create') }}">
+	@csrf
+	<input type="hidden" name="plant_id" value="{{ plant.id }}">
+	<button type="submit">Ajouter au panier</button>
+</form>
+@endif
+@endsection
+
+
+## resources/views/plants/edit.edge
+
+@layout('layouts/application')
+
+@section('content')
+<h1>Modifier la plante</h1>
+<form method="POST" action="{{ route('plants.update', {id: plant.id}) }}">
+	@csrf
+	<input type="hidden" name="_method" value="PUT">
+	<label>Nom : <input type="text" name="name" value="{{ plant.name }}"></label><br>
+	<label>Description : <textarea name="description">{{ plant.description }}</textarea></label><br>
+	<label>Prix : <input type="number" step="0.01" name="price" value="{{ plant.price }}"></label><br>
+	<label>Stock : <input type="number" name="stock" value="{{ plant.stock }}"></label><br>
+	<button type="submit">Mettre à jour</button>
+</form>
+@endsection
+
+
+## resources/views/plants/index.edge
+
+@layout('layouts/application')
+
+@section('title')
+Liste des plantes
+@endsection
+
+@section('content')
+<h1 class="text-center mb-4">🌿 Liste des Plantes</h1>
+
+@if(auth.user && auth.user.admin)
+	<a href="{{ route('Admin/PlantsController.create') }}" class="btn btn-info mb-3">Nouvelle Plante</a>
+@endif
+
+<div class="row">
+	@each(plant in plants)
+	<div class="col-md-4">
+		<div class="card mb-4 shadow-sm">
+			<div class="card-body">
+				<h5 class="card-title">
+					<a href="{{ route('plants.show', { id: plant.id }) }}" class="text-decoration-none text-dark">
+						{{ plant.name }}
+					</a>
+				</h5>
+				<p class="card-text">
+					<strong>Prix :</strong> {{ plant.price }} €<br>
+					@if(auth.user?.admin)
+						<strong>Stock :</strong> {{ plant.stock }} unités
+					@endif
+				</p>
+				<button class="btn btn-success w-100"
+					onclick="cartInstance.add({{ plant.id }}, '{{ plant.name }}', {{ plant.price }}, {{ plant.stock }})">
+					Ajouter au panier
+				</button>
+			</div>
+		</div>
+	</div>
+	@endeach
+</div>
+@endsection
+
+
+## resources/views/orders/new.edge
+
+@layout('layouts/application')
+
+@section('content')
+<h1>Nouvelle commande</h1>
+<form method="POST" action="{{ route('orders.create') }}">
+	@csrf
+	<p>Valider votre commande ?</p>
+	<button type="submit">Commander</button>
+</form>
+@endsection
+
+
+## resources/views/orders/_order_card.edge
+
+<div>
+	<p>Commande #{{ order.id }} - {{ order.totalPrice }} €</p>
+	<p>Status : {{ order.status }}</p>
+</div>
+
+
+## resources/views/orders/index.edge
+
+@layout('layouts/application')
+
+@section('content')
+<h1>Mes commandes</h1>
+@if(orders.length === 0)
+	<p>Aucune commande trouvée.</p>
+@else
+<ul>
+	@each(order in orders)
+	<li>
+		Commandé le {{ order.createdAt.toLocaleDateString('fr-FR') }} -
+		{{ order.totalPrice }} €
+		({{ order.status }})
+	</li>
+	@endeach
+</ul>
+@endif
+@endsection
+
+
+## resources/views/orders/create.edge
+
+@layout('layouts/application')
+
+@section('content')
+<h1>Commande créée</h1>
+<p>Votre commande a bien été enregistrée.</p>
+<a href="{{ route('orders.index') }}">Retour à mes commandes</a>
+@endsection
+
+
+## resources/views/layouts/_flash_messages.edge
+
+@if(flashMessages.all())
+	@each(key in flashMessages.keys())
+		<div class="flash-{{ key }}">{{ flashMessages.get(key) }}</div>
+	@endeach
+@endif
+
+
+## resources/views/layouts/application.edge
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>@!section('title', 'PlantShop')</title>
+
+	<!-- Bootstrap CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+	@include('layouts/_flash_messages')
+	@include('layouts/_navbar')
+
+	<div class="container mt-4">
+		@!section('content')
+	</div>
+
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+## resources/views/layouts/_navbar.edge
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	<div class="container">
+		<a class="navbar-brand" href="{{ route('home') }}">🌿 PlantShop</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav ms-auto">
+				@if(auth.user)
+					<li class="nav-item d-flex align-items-center text-white me-3">
+						{{ auth.user.name }}
+						@if(auth.user.admin)
+							(Administrateur)
+						@endif
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{ route('carts.index') }}">Mon Panier</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{ route('orders.index') }}">Mes Commandes</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{ route('users.show', { id: auth.user.id }) }}">Mon Profil</a>
+					</li>
+					@if(auth.user.admin)
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Admin</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="{{ route('admin.plants.index') }}">Gestion des Plantes</a></li>
+								<li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Gestion des Utilisateurs</a></li>
+							</ul>
+						</li>
+					@endif
+					<li class="nav-item">
+						<form method="POST" action="{{ route('logout') }}">
+							@csrf
+							<button type="submit" class="btn btn-link nav-link">Déconnexion</button>
+						</form>
+					</li>
+				@else
+					<li class="nav-item">
+						<a class="nav-link" href="{{ route('register.show') }}">S'inscrire</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{ route('login.show') }}">Se Connecter</a>
+					</li>
+				@endif
+			</ul>
+		</div>
+	</div>
+</nav>
+
+
+## resources/views/errors/unauthorized.edge
+
+<p> It's a 403 </p>
+
+
+## resources/views/errors/server-error.edge
+
+<p> It's a 500 </p>
+
+
+## resources/views/errors/not-found.edge
+
+<p> It's a 404 </p>
+
+
+## resources/views/users/show.edge
+
+@extends('layouts/application')
+
+@section('title', 'Mon profil')
+
+@section('content')
+	<h1>Profil</h1>
+	<p><strong>Nom :</strong> {{ user.name }}</p>
+	<p><strong>Email :</strong> {{ user.email }}</p>
+	<a href="{{ route('UsersController.edit', { id: user.id }) }}">Modifier</a>
+@endsection
+
+
+## resources/views/users/edit.edge
+
+@extends('layouts/application')
+
+@section('title', 'Modifier mon profil')
+
+@section('content')
+	<h1>Modifier le profil</h1>
+	<form method="POST" action="{{ route('UsersController.update', { id: user.id }) }}">
+		@csrf
+		@method('PUT')
+		<div>
+			<label>Nom</label>
+			<input type="text" name="name" value="{{ user.name }}" required>
+		</div>
+		<div>
+			<label>Email</label>
+			<input type="email" name="email" value="{{ user.email }}" required>
+		</div>
+		<button type="submit">Mettre à jour</button>
+	</form>
+@endsection
+
+
+
+# PROVIDERS
+#
+## providers/AppProvider.ts
+
+import type { ApplicationContract } from '@ioc:Adonis/Core/Application'
+
+export default class AppProvider {
+  constructor (protected app: ApplicationContract) {
+  }
+
+  public register () {
+    // Register your own bindings
+  }
+
+  public async boot () {
+    // IoC container is ready
+  }
+
+  public async ready () {
+    // App is ready
+  }
+
+  public async shutdown () {
+    // Cleanup, since app is going down
+  }
+}
+
+
+
+# CONTRATS
+#
+## contracts/events.ts
+
+/**
+ * Contract source: https://git.io/JfefG
+ *
+ * Feel free to let us know via PR, if you find something broken in this contract
+ * file.
+ */
+
+declare module '@ioc:Adonis/Core/Event' {
+  /*
+  |--------------------------------------------------------------------------
+  | Define typed events
+  |--------------------------------------------------------------------------
+  |
+  | You can define types for events inside the following interface and
+  | AdonisJS will make sure that all listeners and emit calls adheres
+  | to the defined types.
+  |
+  | For example:
+  |
+  | interface EventsList {
+  |   'new:user': UserModel
+  | }
+  |
+  | Now calling `Event.emit('new:user')` will statically ensure that passed value is
+  | an instance of the the UserModel only.
+  |
+  */
+  interface EventsList {
+    //
+  }
+}
+
+
+## contracts/drive.ts
+
+/**
+ * Contract source: https://git.io/JBt3I
+ *
+ * Feel free to let us know via PR, if you find something broken in this contract
+ * file.
+ */
+
+import type { InferDisksFromConfig } from '@adonisjs/core/build/config'
+import type driveConfig from '../config/drive'
+
+declare module '@ioc:Adonis/Core/Drive' {
+  interface DisksList extends InferDisksFromConfig<typeof driveConfig> {}
+}
+
+
+## contracts/auth.ts
+
+/**
+ * Contract source: https://git.io/JOdz5
+ *
+ * Feel free to let us know via PR, if you find something broken in this
+ * file.
+ */
+
+import User from 'App/Models/User'
+
+declare module '@ioc:Adonis/Addons/Auth' {
+  /*
+  |--------------------------------------------------------------------------
+  | Providers
+  |--------------------------------------------------------------------------
+  |
+  | The providers are used to fetch users. The Auth module comes pre-bundled
+  | with two providers that are `Lucid` and `Database`. Both uses database
+  | to fetch user details.
+  |
+  | You can also create and register your own custom providers.
+  |
+  */
+  interface ProvidersList {
+    /*
+    |--------------------------------------------------------------------------
+    | User Provider
+    |--------------------------------------------------------------------------
+    |
+    | The following provider uses Lucid models as a driver for fetching user
+    | details from the database for authentication.
+    |
+    | You can create multiple providers using the same underlying driver with
+    | different Lucid models.
+    |
+    */
+    user: {
+      implementation: LucidProviderContract<typeof User>
+      config: LucidProviderConfig<typeof User>
+    }
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Guards
+  |--------------------------------------------------------------------------
+  |
+  | The guards are used for authenticating users using different drivers.
+  | The auth module comes with 3 different guards.
+  |
+  | - SessionGuardContract
+  | - BasicAuthGuardContract
+  | - OATGuardContract ( Opaque access token )
+  |
+  | Every guard needs a provider for looking up users from the database.
+  |
+  */
+  interface GuardsList {
+    /*
+    |--------------------------------------------------------------------------
+    | Web Guard
+    |--------------------------------------------------------------------------
+    |
+    | The web guard uses sessions for maintaining user login state. It uses
+    | the `user` provider for fetching user details.
+    |
+    */
+    web: {
+      implementation: SessionGuardContract<'user', 'web'>
+      config: SessionGuardConfig<'user'>
+      client: SessionClientContract<'user'>
+    }
+  }
+}
+
+
+## contracts/tests.ts
+
+/**
+ * Contract source: https://bit.ly/3DP1ypf
+ *
+ * Feel free to let us know via PR, if you find something broken in this contract
+ * file.
+ */
+
+import '@japa/runner'
+
+declare module '@japa/runner' {
+  interface TestContext {
+    // Extend context
+  }
+
+  interface Test<TestData> {
+    // Extend test
+  }
+}
+
+
+## contracts/hash.ts
+
+/**
+ * Contract source: https://git.io/Jfefs
+ *
+ * Feel free to let us know via PR, if you find something broken in this contract
+ * file.
+ */
+
+import type { InferListFromConfig } from '@adonisjs/core/build/config'
+import type hashConfig from '../config/hash'
+
+declare module '@ioc:Adonis/Core/Hash' {
+  interface HashersList extends InferListFromConfig<typeof hashConfig> {}
+}
+
+
+## contracts/env.ts
+
+/**
+ * Contract source: https://git.io/JTm6U
+ *
+ * Feel free to let us know via PR, if you find something broken in this contract
+ * file.
+ */
+
+declare module '@ioc:Adonis/Core/Env' {
+  /*
+  |--------------------------------------------------------------------------
+  | Getting types for validated environment variables
+  |--------------------------------------------------------------------------
+  |
+  | The `default` export from the "../env.ts" file exports types for the
+  | validated environment variables. Here we merge them with the `EnvTypes`
+  | interface so that you can enjoy intellisense when using the "Env"
+  | module.
+  |
+  */
+
+  type CustomTypes = typeof import('../env').default
+  interface EnvTypes extends CustomTypes {
+  }
+}
+
+
+
+# COMMANDES
+#
+## commands/index.ts
+
+import { listDirectoryFiles } from '@adonisjs/core/build/standalone'
+import Application from '@ioc:Adonis/Core/Application'
+
+/*
+|--------------------------------------------------------------------------
+| Exporting an array of commands
+|--------------------------------------------------------------------------
+|
+| Instead of manually exporting each file from this directory, we use the
+| helper `listDirectoryFiles` to recursively collect and export an array
+| of filenames.
+|
+| Couple of things to note:
+|
+| 1. The file path must be relative from the project root and not this directory.
+| 2. We must ignore this file to avoid getting into an infinite loop
+|
+*/
+export default listDirectoryFiles(__dirname, Application.appRoot, ['./commands/index'])
+
+
+
+# STATISTIQUES
+#
+      1 ## ace-manifest.json
+      1 ## .adonisrc.json
+     14 ## app
+      1 ## commands
+      6 ## contracts
+      3 ## database
+      1 ## .env.example
+      1 ## env.ts
+      1 ## package.json
+      1 ## providers
+     23 ## resources
+      1 ## server.ts
+      2 ## start
+      1 ## tsconfig.json
