@@ -1,13 +1,39 @@
 @layout('layouts/application')
 
+@section('title')
+Liste des plantes
+@endsection
+
 @section('content')
-<h1>Plantes disponibles</h1>
-<ul>
+<h1 class="text-center mb-4">🌿 Liste des Plantes</h1>
+
+@if(auth.user && auth.user.admin)
+	<a href="{{ route('Admin/PlantsController.create') }}" class="btn btn-info mb-3">Nouvelle Plante</a>
+@endif
+
+<div class="row">
 	@each(plant in plants)
-	<li>
-		<a href="{{ route('plants.show', {id: plant.id}) }}">{{ plant.name }}</a>
-		({{ plant.price }} €)
-	</li>
+	<div class="col-md-4">
+		<div class="card mb-4 shadow-sm">
+			<div class="card-body">
+				<h5 class="card-title">
+					<a href="{{ route('plants.show', { id: plant.id }) }}" class="text-decoration-none text-dark">
+						{{ plant.name }}
+					</a>
+				</h5>
+				<p class="card-text">
+					<strong>Prix :</strong> {{ plant.price }} €<br>
+					@if(auth.user?.admin)
+						<strong>Stock :</strong> {{ plant.stock }} unités
+					@endif
+				</p>
+				<button class="btn btn-success w-100"
+					onclick="cartInstance.add({{ plant.id }}, '{{ plant.name }}', {{ plant.price }}, {{ plant.stock }})">
+					Ajouter au panier
+				</button>
+			</div>
+		</div>
+	</div>
 	@endeach
-</ul>
+</div>
 @endsection
