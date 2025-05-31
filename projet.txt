@@ -60,11 +60,14 @@
 ├── Makefile
 ├── package.json
 ├── package-lock.json
+├── projet_adonis.txt
 ├── projet.txt
 ├── providers
 │   └── AppProvider.ts
 ├── public
 │   ├── favicon.ico
+│   ├── js
+│   │   └── application.js
 │   └── styles.css
 ├── resources
 │   ├── views
@@ -95,8 +98,10 @@
 │   │   │   ├── edit.edge
 │   │   │   ├── index.edge
 │   │   │   └── show.edge
+│   │   ├── registrations
+│   │   │   └── register.edge
 │   │   ├── sessions
-│   │   │   └── new.edge
+│   │   │   └── login.edge
 │   │   └── users
 │   │       ├── edit.edge
 │   │       └── show.edge
@@ -110,10 +115,11 @@
 │   └── functional
 │       └── hello_world.spec.ts
 ├── test.ts
+├── touch
 ├── tsconfig.json
 └── users.txt
 
-31 directories, 80 files
+33 directories, 84 files
 
 # CONFIG
 #
@@ -1514,6 +1520,7 @@ import Server from '@ioc:Adonis/Core/Server'
 */
 Server.middleware.register([
   () => import('@ioc:Adonis/Core/BodyParser'),
+	() => import('@ioc:Adonis/Addons/Shield'),
 ])
 
 /*
@@ -1881,30 +1888,35 @@ export default class Seed extends BaseSeeder {
 
 # VUES
 #
-## resources/views/sessions/new.edge
+## resources/views/sessions/login.edge
 
-@extends('layouts/application')
+@layout('layouts/application')
 
-@section('title', 'Connexion')
+@section('title')
+Connexion
+@endsection
 
 @section('content')
 	<h1>Connexion</h1>
 	@if(flashMessages.get('error'))
 		<div class="alert alert-danger">{{ flashMessages.get('error') }}</div>
 	@endif
-	<form method="POST" action="{{ route('SessionsController.login') }}">
-		@csrf
-		<div>
+	<form method="POST" action="{{ route('login.perform') }}">
+		{{ csrfField() }}
+		<div class="mb-3">
 			<label>Email</label>
-			<input type="email" name="email" required>
+			<input type="email" name="email" class="form-control" required>
 		</div>
-		<div>
+		<div class="mb-3">
 			<label>Mot de passe</label>
-			<input type="password" name="password" required>
+			<input type="password" name="password" class="form-control" required>
 		</div>
-		<button type="submit">Se connecter</button>
+		<button type="submit" class="btn btn-primary">Se connecter</button>
 	</form>
-	<a href="{{ route('RegistrationsController.showRegisterForm') }}">Créer un compte</a>
+	<p class="mt-3">
+		Pas encore inscrit ?
+		<a href="{{ route('register.show') }}">Créer un compte</a>
+	</p>
 @endsection
 
 
@@ -2220,8 +2232,10 @@ Liste des plantes
 
 	<!-- Bootstrap CSS -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-	<!-- costum CSS  -->
+	<!-- Costum CSS  -->
 	<link rel="stylesheet" href="/styles.css">
+		<!-- Costum Javascriptd  -->
+	<script src="/js/application.js"></script>
 </head>
 <body>
 	@include('layouts/_flash_messages')
@@ -2295,6 +2309,53 @@ Liste des plantes
 		</div>
 	</div>
 </nav>
+
+
+## resources/views/registrations/register.edge
+
+@layout('layouts/application')
+
+@section('title')
+S'inscrire
+@endsection
+
+@section('content')
+	<h1>S'inscrire</h1>
+
+	@if(flashMessages.get('error'))
+		<div class="alert alert-danger">{{ flashMessages.get('error') }}</div>
+	@endif
+
+	<form method="POST" action="{{ route('register.perform') }}">
+		{{ csrfField() }}
+
+		<div class="mb-3">
+			<label for="name" class="form-label">Nom</label>
+			<input type="text" id="name" name="name" class="form-control" required>
+		</div>
+
+		<div class="mb-3">
+			<label for="email" class="form-label">Email</label>
+			<input type="email" id="email" name="email" class="form-control" required>
+		</div>
+
+		<div class="mb-3">
+			<label for="password" class="form-label">Mot de passe</label>
+			<input type="password" id="password" name="password" class="form-control" required>
+		</div>
+
+		<div class="mb-3">
+			<label for="password_confirmation" class="form-label">Confirmation</label>
+			<input type="password" id="password_confirmation" name="password_confirmation" class="form-control" required>
+		</div>
+
+		<button type="submit" class="btn btn-primary">Créer un compte</button>
+	</form>
+
+	<p class="mt-3">
+		Déjà inscrit ? <a href="{{ route('login.show') }}">Se connecter</a>
+	</p>
+@endsection
 
 
 ## resources/views/errors/unauthorized.edge
@@ -2617,7 +2678,7 @@ export default listDirectoryFiles(__dirname, Application.appRoot, ['./commands/i
       1 ## env.ts
       1 ## package.json
       1 ## providers
-     23 ## resources
+     24 ## resources
       1 ## server.ts
       2 ## start
       1 ## tsconfig.json
