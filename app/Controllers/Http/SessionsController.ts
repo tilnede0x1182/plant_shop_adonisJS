@@ -34,6 +34,6 @@ export default class SessionsController {
 	 */
 	public async logout({ auth, response }: HttpContextContract) {
 		await auth.logout()
-		return response.redirect().toRoute('logout')
+		return response.redirect().toRoute('home')
 	}
 }

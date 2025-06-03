@@ -11,11 +11,11 @@ Liste des plantes
 	<a href="{{ route('Admin/PlantsController.create') }}" class="btn btn-info mb-3">Nouvelle Plante</a>
 @endif
 
-@if(auth.user)
+{{-- @if(auth.user)
 	<p>Connecté en tant que : {{ auth.user.email }} ({{ auth.user.admin ? 'admin' : 'user' }})</p>
 @else
 	<p>Non connecté</p>
-@endif
+@endif --}}
 
 
 <div class="row">
