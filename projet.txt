@@ -962,6 +962,7 @@ export default class RegistrationsController {
 // app/Controllers/Http/OrdersController.ts
 
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import Order from 'App/Models/Order'
 import Plant from 'App/Models/Plant'
 import OrderItem from 'App/Models/OrderItem'
@@ -995,7 +996,7 @@ export default class OrdersController {
 		const items = JSON.parse(request.input('order.items', '[]'))
 		let total = 0
 
-		const trx = await Order.db.transaction()
+		const trx = await Database.transaction()
 		try {
 			const commande = await Order.create({
 				userId: auth.user!.id,
@@ -1481,8 +1482,10 @@ Route.group(() => {
   // Panier
   Route.resource('carts', 'CartsController').only(['index'])
 
-  // Commandes
-  Route.resource('orders', 'OrdersController').only(['index', 'new', 'create'])
+  // Commandes - Routes explicites pour éviter les conflits
+  Route.get('/orders', 'OrdersController.index').as('orders.index')
+  Route.get('/orders/new', 'OrdersController.new').as('orders.new')
+  Route.post('/orders', 'OrdersController.create').as('orders.create')
 }).middleware('auth')
 
 // Administration
@@ -2148,7 +2151,7 @@ Liste des utilisateurs
 @section('content')
 <h1>Modifier la plante</h1>
 <form method="POST" action="{{ route('plants.update', {id: plant.id}) }}">
-	@csrf
+	{{ csrfField() }}
 	<input type="hidden" name="_method" value="PUT">
 	<label>Nom : <input type="text" name="name" value="{{ plant.name }}"></label><br>
 	<label>Description : <textarea name="description">{{ plant.description }}</textarea></label><br>
@@ -2232,12 +2235,30 @@ Nouvelle commande
 @end
 
 @section('content')
-<h1>Nouvelle commande</h1>
-<form method="POST" action="{{ route('OrdersController.create') }}">
+<h1 class="text-center mb-4">Valider ma commande</h1>
+
+@if(flashMessages.get('alert'))
+	<div class="alert alert-danger">
+		{{ flashMessages.get('alert') }}
+	</div>
+@endif
+
+<div id="order-review-container">
+	<p class="alert alert-info">Chargement de votre panier...</p>
+</div>
+
+<form id="order-form" method="POST" action="{{ route('OrdersController.create') }}">
 	{{ csrfField() }}
-	<p>Valider votre commande ?</p>
-	<button type="submit">Commander</button>
+	<input type="hidden" name="order.items" id="order-items-input">
+	<button type="submit" class="btn btn-success w-100 mt-3">Confirmer la commande</button>
 </form>
+
+<script>
+document.getElementById("order-form").addEventListener("submit", function() {
+	cartInstance.clear()
+})
+</script>
+
 @end
 
 
@@ -2371,7 +2392,7 @@ Commande créée
 					@endif
 					<li class="nav-item">
 						<form method="POST" action="{{ route('logout') }}">
-							@csrf
+							{{ csrfField() }}
 							<button type="submit" class="nav-link btn btn-link p-0" style="text-decoration: none;">Déconnexion</button>
 						</form>
 					</li>
@@ -2485,9 +2506,9 @@ Mon profil
 
 @section('content')
 	<h1>Profil</h1>
-	<p><strong>Nom :</strong> {{ user.name }}</p>
-	<p><strong>Email :</strong> {{ user.email }}</p>
-	<a href="{{ route('UsersController.edit', { id: user.id }) }}">Modifier</a>
+	<p><strong>Nom :</strong> {{ utilisateur.name }}</p>
+	<p><strong>Email :</strong> {{ utilisateur.email }}</p>
+	<a href="{{ route('UsersController.edit', { id: utilisateur.id }) }}">Modifier</a>
 @end
 
 
@@ -2501,16 +2522,16 @@ Modifier mon profil
 
 @section('content')
 	<h1>Modifier le profil</h1>
-	<form method="POST" action="{{ route('UsersController.update', { id: user.id }) }}">
+	<form method="POST" action="{{ route('UsersController.update', { id: utilisateur.id }) }}">
 		{{ csrfField() }}
 		<input type="hidden" name="_method" value="PUT">
 		<div>
 			<label>Nom</label>
-			<input type="text" name="name" value="{{ user.name }}" required>
+			<input type="text" name="name" value="{{ utilisateur.name }}" required>
 		</div>
 		<div>
 			<label>Email</label>
-			<input type="email" name="email" value="{{ user.email }}" required>
+			<input type="email" name="email" value="{{ utilisateur.email }}" required>
 		</div>
 		<button type="submit">Mettre à jour</button>
 	</form>
