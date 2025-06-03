@@ -8,7 +8,7 @@ Liste des plantes
 <h1 class="text-center mb-4">🌿 Liste des Plantes</h1>
 
 @if(auth.user && auth.user.admin)
-	<a href="{{ route('Admin/PlantsController.create') }}" class="btn btn-info mb-3">Nouvelle Plante</a>
+	<a href="{{ route('Admin/PlantsController.create') }}" class="btn btn-success mb-3">Nouvelle Plante</a>
 @endif
 
 {{-- @if(auth.user)

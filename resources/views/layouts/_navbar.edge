@@ -8,12 +8,12 @@
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav ms-auto">
 				@if(auth.user && auth.user.name)
-					<li class="nav-item d-flex align-items-center text-white me-3">
-						{{ auth.user.name.split(' ').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') }}
-						@if(typeof auth.user.admin !== 'undefined' && auth.user.admin)
-							(Administrateur)
-						@endif
-					</li>
+				<li class="nav-item d-flex align-items-center text-white me-3">
+					{{ auth.user.name.split(' ').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') }}
+					@if(typeof auth.user.admin !== 'undefined' && auth.user.admin)
+					(Administrateur)
+					@endif
+				</li>
 				@endif
 
 				<li class="nav-item">
@@ -21,34 +21,34 @@
 				</li>
 
 				@if(auth.user)
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('orders.index') }}">Mes Commandes</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('users.show', { id: auth.user.id }) }}">Mon Profil</a>
-					</li>
-					@if(auth.user.admin)
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Admin</a>
-							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="{{ route('admin.plants.index') }}">Gestion des Plantes</a></li>
-								<li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Gestion des Utilisateurs</a></li>
-							</ul>
-						</li>
-					@endif
-					<li class="nav-item">
-						<form method="POST" action="{{ route('logout') }}">
-							{{ csrfField() }}
-							<button type="submit" class="nav-link btn btn-link p-0" style="text-decoration: none;">Déconnexion</button>
-						</form>
-					</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ route('orders.index') }}">Mes Commandes</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ route('users.show', { id: auth.user.id }) }}">Mon Profil</a>
+				</li>
+				@if(auth.user.admin)
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Admin</a>
+					<ul class="dropdown-menu">
+						<li><a class="dropdown-item" href="{{ route('admin.plants.index') }}">Gestion des Plantes</a></li>
+						<li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Gestion des Utilisateurs</a></li>
+					</ul>
+				</li>
+				@endif
+				<li class="nav-item logout-item">
+					<form method="POST" action="{{ route('logout') }}">
+						{{ csrfField() }}
+						<button type="submit" class="nav-link">Déconnexion</button>
+					</form>
+				</li>
 				@else
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('register.show') }}">S'inscrire</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('login.show') }}">Se Connecter</a>
-					</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ route('register.show') }}">S'inscrire</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ route('login.show') }}">Se Connecter</a>
+				</li>
 				@endif
 			</ul>
 		</div>
