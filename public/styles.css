@@ -1,21 +1,55 @@
-a.cart-plant-link {
-	color: black;
-	text-decoration: none;
-}
-
-a.cart-plant-link:hover {
-	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
+/* Liens produit dans le panier */
+a.cart-plant-link,
 .cart-plant-link.confirmed {
-	color: black;
-	text-decoration: none;
+  color: black;
+  text-decoration: none;
 }
-
+a.cart-plant-link:hover {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 .cart-plant-link.confirmed:hover {
-	text-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
 }
 
+/* Couleur de fond de la navbar */
 .custom-navbar {
-	background-color: #ecad1c;
+  background-color: #ecad1c;
+}
+
+/* ---------------------------
+   Bouton “Déconnexion” dans la navbar
+   (identique aux liens .nav-link)
+   --------------------------- */
+
+/* Conteneur du formulaire inline */
+.navbar .nav-item.logout-item {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+.navbar .nav-item.logout-item form {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+/* Bouton stylé comme un <a class="nav-link"> */
+.navbar-dark .navbar-nav .logout-item form button.nav-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  display: inline;
+  font: inherit;
+  text-decoration: none;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+.navbar-dark .navbar-nav .logout-item form button.nav-link:hover,
+.navbar-dark .navbar-nav .logout-item form button.nav-link:focus {
+  color: rgba(255, 255, 255, 0.75); /* même hover que les autres .nav-link */
+  text-decoration: none;
+  box-shadow: none;
+  outline: none;
 }
