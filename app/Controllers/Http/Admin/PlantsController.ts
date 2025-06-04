@@ -11,8 +11,8 @@ export default class PlantsController {
 	 * Liste toutes les plantes (admin)
 	 */
 	public async index({ view }: HttpContextContract) {
-		const plantes = await Plant.all()
-		return view.render('admin/plants/index', { plantes })
+		const plantes = await Plant.query().orderBy('name', 'asc')
+		return view.render('admin/plants/index', { plantes: plantes })
 	}
 
 	/**

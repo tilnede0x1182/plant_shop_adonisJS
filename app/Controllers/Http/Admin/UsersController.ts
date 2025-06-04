@@ -11,8 +11,8 @@ export default class UsersController {
 	 * Liste tous les utilisateurs
 	 */
 	public async index({ view }: HttpContextContract) {
-		const utilisateurs = await User.all()
-		return view.render('admin/users/index', { utilisateurs })
+		const utilisateurs = await User.query().orderBy('admin', 'desc').orderBy('name', 'asc')
+		return view.render('admin/users/index', { utilisateurs: utilisateurs })
 	}
 
 	/**
