@@ -21,7 +21,7 @@ Gestion des plantes
 			</tr>
 		</thead>
 		<tbody>
-			@each(plant in plants)
+			@each(plant in plantes)
 				<tr>
 					<td>
 						<a href="{{ route('plants.show', { id: plant.id }) }}" class="text-decoration-none text-dark">

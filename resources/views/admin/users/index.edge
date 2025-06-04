@@ -17,7 +17,7 @@ Liste des utilisateurs
 			</tr>
 		</thead>
 		<tbody>
-			@each(user in users)
+			@each(user in utilisateurs)
 				<tr>
 					<td>
 						<a href="{{ route('admin.users.show', { id: user.id }) }}" class="text-decoration-none text-dark">
