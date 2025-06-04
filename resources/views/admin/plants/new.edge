@@ -6,5 +6,5 @@ Nouvelle plante
 
 @section('content')
 	<h1>Créer une plante</h1>
-	@include('admin/plants/_form', { plant: null, action: route('AdminPlantsController.store'), method: 'POST' })
+	@include('admin/plants/_form', { plant: {}, action: route('admin.plants.store'), method: 'POST' })
 @end

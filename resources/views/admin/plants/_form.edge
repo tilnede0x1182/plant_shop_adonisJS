@@ -22,5 +22,7 @@
 		<input type="number" name="stock" id="stock" value="{{ plante.stock }}" class="form-control" required>
 	</div>
 
-	<button type="submit" class="btn btn-primary">Mettre à jour</button>
+	<button type="submit" class="btn btn-primary">
+		{{ plante.id ? 'Mettre à jour' : 'Créer' }}
+	</button>
 </form>
