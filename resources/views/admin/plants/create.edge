@@ -1,0 +1,30 @@
+@layout('layouts/application')
+
+@section('title')
+Créer une plante
+@end
+
+@section('content')
+	<h1>Nouvelle plante</h1>
+
+	<form method="POST" action="{{ route('admin.plants.store') }}">
+		{{ csrfField() }}
+
+		<div class="mb-3">
+			<label for="name" class="form-label">Nom</label>
+			<input type="text" name="name" id="name" class="form-control" required>
+		</div>
+
+		<div class="mb-3">
+			<label for="description" class="form-label">Description</label>
+			<textarea name="description" id="description" class="form-control" rows="3"></textarea>
+		</div>
+
+		<div class="mb-3">
+			<label for="price" class="form-label">Prix</label>
+			<input type="number" name="price" id="price" class="form-control" step="0.01" required>
+		</div>
+
+		<button type="submit" class="btn btn-primary">Créer</button>
+	</form>
+@end
