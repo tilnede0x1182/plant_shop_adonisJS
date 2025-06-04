@@ -21,7 +21,7 @@ export default class PlantsController {
    * Affiche une plante
    */
   public async show({ params, view }: HttpContextContract) {
-    const plante = await Plant.findOrFail(params.id);
-    return view.render("plants/show", { plante });
+    const plant = await Plant.findOrFail(params.id);
+    return view.render("plants/show", { plant });
   }
 }

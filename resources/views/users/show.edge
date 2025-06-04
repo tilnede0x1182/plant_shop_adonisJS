@@ -6,7 +6,11 @@ Mon profil
 
 @section('content')
 	<h1>Profil</h1>
-	<p><strong>Nom :</strong> {{ utilisateur.name }}</p>
+	@if(utilisateur.name)
+		<p><strong>Nom :</strong> {{ utilisateur.name }}</p>
+	@endif
+
 	<p><strong>Email :</strong> {{ utilisateur.email }}</p>
-	<a href="{{ route('UsersController.edit', { id: utilisateur.id }) }}">Modifier</a>
+
+	<a href="{{ route('UsersController.edit', { id: utilisateur.id }) }}" class="btn btn-primary">Modifier mon profil</a>
 @end

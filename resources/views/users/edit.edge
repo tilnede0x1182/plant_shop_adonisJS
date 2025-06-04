@@ -9,14 +9,27 @@ Modifier mon profil
 	<form method="POST" action="{{ route('UsersController.update', { id: utilisateur.id }) }}">
 		{{ csrfField() }}
 		<input type="hidden" name="_method" value="PUT">
-		<div>
-			<label>Nom</label>
-			<input type="text" name="name" value="{{ utilisateur.name }}" required>
+
+		@if(utilisateur.errors && Object.keys(utilisateur.errors).length)
+			<div class="alert alert-danger">
+				<ul>
+					@each(error in Object.values(utilisateur.errors).flat())
+						<li>{{ error }}</li>
+					@end
+				</ul>
+			</div>
+		@endif
+
+		<div class="mb-3">
+			<label for="email" class="form-label">Email</label>
+			<input type="email" name="email" id="email" value="{{ utilisateur.email }}" class="form-control" required>
 		</div>
-		<div>
-			<label>Email</label>
-			<input type="email" name="email" value="{{ utilisateur.email }}" required>
+
+		<div class="mb-3">
+			<label for="name" class="form-label">Nom</label>
+			<input type="text" name="name" id="name" value="{{ utilisateur.name }}" class="form-control" required>
 		</div>
-		<button type="submit">Mettre à jour</button>
+
+		<button type="submit" class="btn btn-primary">Enregistrer</button>
 	</form>
 @end
