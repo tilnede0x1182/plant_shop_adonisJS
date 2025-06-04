@@ -33,10 +33,10 @@ Gestion des plantes
 					<td class="text-center">
 						<div class="d-flex justify-content-center gap-2">
 							<a href="{{ route('admin.plants.edit', { id: plant.id }) }}" class="btn btn-warning btn-sm">✏ Modifier</a>
-							<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }) }}" class="d-inline">
+							<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }) }}"
+										onsubmit="return confirm('Voulez-vous supprimer cette plante ?')">
 								{{ csrfField() }}
-								<input type="hidden" name="_method" value="DELETE">
-								<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette plante ?')">🗑 Supprimer</button>
+								<button type="submit" class="btn btn-danger">Supprimer</button>
 							</form>
 						</div>
 					</td>

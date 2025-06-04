@@ -1,7 +1,7 @@
 
 # ARBORESCENCE
 #
-/home/tilnede0x1182/code/tilnede0x1182/Personnel/2025/Entrainement/Javascript/AdonisJS/plant_shop_adonisJS
+/home/tilnede0x1182/code/tilnede0x1182/Personnel/2025/Entrainement/plant_shop/Javascript/AdonisJS/plant_shop_adonisJS
 ├── ace
 ├── ace-manifest.json
 ├── app
@@ -72,6 +72,7 @@
 │   ├── views
 │   │   ├── admin
 │   │   │   ├── plants
+│   │   │   │   ├── create.edge
 │   │   │   │   ├── edit.edge
 │   │   │   │   ├── _form.edge
 │   │   │   │   ├── index.edge
@@ -94,7 +95,9 @@
 │   │   │   ├── create.edge
 │   │   │   ├── index.edge
 │   │   │   ├── new.edge
-│   │   │   └── _order_card.edge
+│   │   │   ├── _order_card copy.edge
+│   │   │   ├── _order_card.edge
+│   │   │   └── show.edge
 │   │   ├── plants
 │   │   │   ├── edit.edge
 │   │   │   ├── index.edge
@@ -120,7 +123,7 @@
 ├── tsconfig.json
 └── users.txt
 
-34 directories, 84 files
+34 directories, 87 files
 
 # CONFIG
 #
@@ -1049,8 +1052,8 @@ export default class UsersController {
 	 * Liste tous les utilisateurs
 	 */
 	public async index({ view }: HttpContextContract) {
-		const utilisateurs = await User.all()
-		return view.render('admin/users/index', { utilisateurs })
+		const utilisateurs = await User.query().orderBy('admin', 'desc').orderBy('name', 'asc')
+		return view.render('admin/users/index', { utilisateurs: utilisateurs })
 	}
 
 	/**
@@ -1107,8 +1110,8 @@ export default class PlantsController {
 	 * Liste toutes les plantes (admin)
 	 */
 	public async index({ view }: HttpContextContract) {
-		const plantes = await Plant.all()
-		return view.render('admin/plants/index', { plantes })
+		const plantes = await Plant.query().orderBy('name', 'asc')
+		return view.render('admin/plants/index', { plantes: plantes })
 	}
 
 	/**
@@ -1197,7 +1200,7 @@ export default class SessionsController {
 	 */
 	public async logout({ auth, response }: HttpContextContract) {
 		await auth.logout()
-		return response.redirect().toRoute('logout')
+		return response.redirect().toRoute('home')
 	}
 }
 
@@ -1296,8 +1299,8 @@ export default class PlantsController {
    * Affiche une plante
    */
   public async show({ params, view }: HttpContextContract) {
-    const plante = await Plant.findOrFail(params.id);
-    return view.render("plants/show", { plante });
+    const plant = await Plant.findOrFail(params.id);
+    return view.render("plants/show", { plant });
   }
 }
 
@@ -1490,10 +1493,21 @@ Route.group(() => {
 
 // Administration
 Route.group(() => {
-  Route.resource('plants', 'Admin/PlantsController').except(['show'])
-  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit', 'update', 'destroy'])
+  // Plantes
+  Route.resource('plants', 'Admin/PlantsController').except(['show', 'destroy'])
+
+  // Route POST pour suppression plantes
+  Route.post('/plants/:id/delete', 'Admin/PlantsController.destroy')
+    .as('plants.destroy')
+
+  // Utilisateurs
+  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit', 'update'])
+
+  // Route POST pour suppression utilisateurs
+  Route.post('/users/:id/delete', 'Admin/UsersController.destroy')
+    .as('users.destroy')
 })
-  .prefix('/admin')
+  .prefix('admin')
   .as('admin')
   .middleware('auth')
 
@@ -1525,6 +1539,7 @@ import Server from '@ioc:Adonis/Core/Server'
 Server.middleware.register([
 	() => import('@ioc:Adonis/Core/BodyParser'),
 	() => import('@ioc:Adonis/Addons/Shield'),
+	() => import('App/Middleware/SilentAuth'),
 ])
 
 
@@ -1548,6 +1563,1493 @@ Server.middleware.registerNamed({
   auth: () => import('App/Middleware/Auth'),
   silentAuth: () => import('App/Middleware/SilentAuth'),
 })
+
+
+
+# CONFIG
+#
+## config/drive.ts
+
+/**
+ * Config source: https://git.io/JBt3o
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import Env from '@ioc:Adonis/Core/Env'
+import { driveConfig } from '@adonisjs/core/build/config'
+import Application from '@ioc:Adonis/Core/Application'
+
+/*
+|--------------------------------------------------------------------------
+| Drive Config
+|--------------------------------------------------------------------------
+|
+| The `DriveConfig` relies on the `DisksList` interface which is
+| defined inside the `contracts` directory.
+|
+*/
+export default driveConfig({
+  /*
+  |--------------------------------------------------------------------------
+  | Default disk
+  |--------------------------------------------------------------------------
+  |
+  | The default disk to use for managing file uploads. The value is driven by
+  | the `DRIVE_DISK` environment variable.
+  |
+  */
+  disk: Env.get('DRIVE_DISK'),
+
+  disks: {
+    /*
+    |--------------------------------------------------------------------------
+    | Local
+    |--------------------------------------------------------------------------
+    |
+    | Uses the local file system to manage files. Make sure to turn off serving
+    | files when not using this disk.
+    |
+    */
+    local: {
+      driver: 'local',
+      visibility: 'public',
+
+      /*
+      |--------------------------------------------------------------------------
+      | Storage root - Local driver only
+      |--------------------------------------------------------------------------
+      |
+      | Define an absolute path to the storage directory from where to read the
+      | files.
+      |
+      */
+      root: Application.tmpPath('uploads'),
+
+      /*
+      |--------------------------------------------------------------------------
+      | Serve files - Local driver only
+      |--------------------------------------------------------------------------
+      |
+      | When this is set to true, AdonisJS will configure a files server to serve
+      | files from the disk root. This is done to mimic the behavior of cloud
+      | storage services that has inbuilt capabilities to serve files.
+      |
+      */
+      serveFiles: true,
+
+      /*
+      |--------------------------------------------------------------------------
+      | Base path - Local driver only
+      |--------------------------------------------------------------------------
+      |
+      | Base path is always required when "serveFiles = true". Also make sure
+      | the `basePath` is unique across all the disks using "local" driver and
+      | you are not registering routes with this prefix.
+      |
+      */
+      basePath: '/uploads',
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | S3 Driver
+    |--------------------------------------------------------------------------
+    |
+    | Uses the S3 cloud storage to manage files. Make sure to install the s3
+    | drive separately when using it.
+    |
+    |**************************************************************************
+    | npm i @adonisjs/drive-s3
+    |**************************************************************************
+    |
+    */
+    // s3: {
+    //   driver: 's3',
+    //   visibility: 'public',
+    //   key: Env.get('S3_KEY'),
+    //   secret: Env.get('S3_SECRET'),
+    //   region: Env.get('S3_REGION'),
+    //   bucket: Env.get('S3_BUCKET'),
+    //   endpoint: Env.get('S3_ENDPOINT'),
+    //
+    //  // For minio to work
+    //  // forcePathStyle: true,
+    // },
+
+    /*
+    |--------------------------------------------------------------------------
+    | GCS Driver
+    |--------------------------------------------------------------------------
+    |
+    | Uses the Google cloud storage to manage files. Make sure to install the GCS
+    | drive separately when using it.
+    |
+    |**************************************************************************
+    | npm i @adonisjs/drive-gcs
+    |**************************************************************************
+    |
+    */
+    // gcs: {
+    //   driver: 'gcs',
+    //   visibility: 'public',
+    //   keyFilename: Env.get('GCS_KEY_FILENAME'),
+    //   bucket: Env.get('GCS_BUCKET'),
+
+      /*
+      |--------------------------------------------------------------------------
+      | Uniform ACL - Google cloud storage only
+      |--------------------------------------------------------------------------
+      |
+      | When using the Uniform ACL on the bucket, the "visibility" option is
+      | ignored. Since, the files ACL is managed by the google bucket policies
+      | directly.
+      |
+      |**************************************************************************
+      | Learn more: https://cloud.google.com/storage/docs/uniform-bucket-level-access
+      |**************************************************************************
+      |
+      | The following option just informs drive whether your bucket is using uniform
+      | ACL or not. The actual setting needs to be toggled within the Google cloud
+      | console.
+      |
+      */
+    //   usingUniformAcl: false,
+    // },
+  },
+})
+
+
+## config/auth.ts
+
+/**
+ * Config source: https://git.io/JY0mp
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import type { AuthConfig } from '@ioc:Adonis/Addons/Auth'
+
+/*
+|--------------------------------------------------------------------------
+| Authentication Mapping
+|--------------------------------------------------------------------------
+|
+| List of available authentication mapping. You must first define them
+| inside the `contracts/auth.ts` file before mentioning them here.
+|
+*/
+const authConfig: AuthConfig = {
+  guard: 'web',
+  guards: {
+    /*
+    |--------------------------------------------------------------------------
+    | Web Guard
+    |--------------------------------------------------------------------------
+    |
+    | Web guard uses classic old school sessions for authenticating users.
+    | If you are building a standard web application, it is recommended to
+    | use web guard with session driver
+    |
+    */
+    web: {
+      driver: 'session',
+
+      provider: {
+        /*
+        |--------------------------------------------------------------------------
+        | Driver
+        |--------------------------------------------------------------------------
+        |
+        | Name of the driver
+        |
+        */
+        driver: 'lucid',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Identifier key
+        |--------------------------------------------------------------------------
+        |
+        | The identifier key is the unique key on the model. In most cases specifying
+        | the primary key is the right choice.
+        |
+        */
+        identifierKey: 'id',
+
+        /*
+        |--------------------------------------------------------------------------
+        | Uids
+        |--------------------------------------------------------------------------
+        |
+        | Uids are used to search a user against one of the mentioned columns. During
+        | login, the auth module will search the user mentioned value against one
+        | of the mentioned columns to find their user record.
+        |
+        */
+        uids: ['email'],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Model
+        |--------------------------------------------------------------------------
+        |
+        | The model to use for fetching or finding users. The model is imported
+        | lazily since the config files are read way earlier in the lifecycle
+        | of booting the app and the models may not be in a usable state at
+        | that time.
+        |
+        */
+        model: () => import('App/Models/User'),
+      },
+    },
+  },
+}
+
+export default authConfig
+
+
+## config/cors.ts
+
+/**
+ * Config source: https://git.io/JfefC
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import type { CorsConfig } from '@ioc:Adonis/Core/Cors'
+
+const corsConfig: CorsConfig = {
+  /*
+  |--------------------------------------------------------------------------
+  | Enabled
+  |--------------------------------------------------------------------------
+  |
+  | A boolean to enable or disable CORS integration from your AdonisJs
+  | application.
+  |
+  | Setting the value to `true` will enable the CORS for all HTTP request. However,
+  | you can define a function to enable/disable it on per request basis as well.
+  |
+  */
+  enabled: false,
+
+  // You can also use a function that return true or false.
+  // enabled: (request) => request.url().startsWith('/api')
+
+  /*
+  |--------------------------------------------------------------------------
+  | Origin
+  |--------------------------------------------------------------------------
+  |
+  | Set a list of origins to be allowed for `Access-Control-Allow-Origin`.
+  | The value can be one of the following:
+  |
+  | https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+  |
+  | Boolean (true)    - Allow current request origin.
+  | Boolean (false)   - Disallow all.
+  | String            - Comma separated list of allowed origins.
+  | Array             - An array of allowed origins.
+  | String (*)        - A wildcard (*) to allow all request origins.
+  | Function          - Receives the current origin string and should return
+  |                     one of the above values.
+  |
+  */
+  origin: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Methods
+  |--------------------------------------------------------------------------
+  |
+  | An array of allowed HTTP methods for CORS. The `Access-Control-Request-Method`
+  | is checked against the following list.
+  |
+  | Following is the list of default methods. Feel free to add more.
+  */
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE'],
+
+  /*
+  |--------------------------------------------------------------------------
+  | Headers
+  |--------------------------------------------------------------------------
+  |
+  | List of headers to be allowed for `Access-Control-Allow-Headers` header.
+  | The value can be one of the following:
+  |
+  | https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers
+  |
+  | Boolean(true)     - Allow all headers mentioned in `Access-Control-Request-Headers`.
+  | Boolean(false)    - Disallow all headers.
+  | String            - Comma separated list of allowed headers.
+  | Array             - An array of allowed headers.
+  | Function          - Receives the current header and should return one of the above values.
+  |
+  */
+  headers: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Expose Headers
+  |--------------------------------------------------------------------------
+  |
+  | A list of headers to be exposed by setting `Access-Control-Expose-Headers`.
+  | header. By default following 6 simple response headers are exposed.
+  |
+  | Cache-Control
+  | Content-Language
+  | Content-Type
+  | Expires
+  | Last-Modified
+  | Pragma
+  |
+  | In order to add more headers, simply define them inside the following array.
+  |
+  | https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
+  |
+  */
+  exposeHeaders: [
+    'cache-control',
+    'content-language',
+    'content-type',
+    'expires',
+    'last-modified',
+    'pragma',
+  ],
+
+  /*
+  |--------------------------------------------------------------------------
+  | Credentials
+  |--------------------------------------------------------------------------
+  |
+  | Toggle `Access-Control-Allow-Credentials` header. If value is set to `true`,
+  | then header will be set, otherwise not.
+  |
+  | https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+  |
+  */
+  credentials: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | MaxAge
+  |--------------------------------------------------------------------------
+  |
+  | Define `Access-Control-Max-Age` header in seconds.
+  | https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
+  |
+  */
+  maxAge: 90,
+}
+
+export default corsConfig
+
+
+## config/shield.ts
+
+/**
+ * Config source: https://git.io/Jvwvt
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import { ShieldConfig } from '@ioc:Adonis/Addons/Shield'
+
+/*
+|--------------------------------------------------------------------------
+| Content Security Policy
+|--------------------------------------------------------------------------
+|
+| Content security policy filters out the origins not allowed to execute
+| and load resources like scripts, styles and fonts. There are wide
+| variety of options to choose from.
+*/
+export const csp: ShieldConfig['csp'] = {
+  /*
+  |--------------------------------------------------------------------------
+  | Enable/disable CSP
+  |--------------------------------------------------------------------------
+  |
+  | The CSP rules are disabled by default for seamless onboarding.
+  |
+  */
+  enabled: false,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Directives
+  |--------------------------------------------------------------------------
+  |
+  | All directives are defined in camelCase and here is the list of
+  | available directives and their possible values.
+  |
+  | https://content-security-policy.com
+  |
+  | @example
+  | directives: {
+  |   defaultSrc: ["'self'", '@nonce', 'cdnjs.cloudflare.com']
+  | }
+  |
+  */
+  directives: {
+  },
+
+  /*
+  |--------------------------------------------------------------------------
+  | Report only
+  |--------------------------------------------------------------------------
+  |
+  | Setting `reportOnly=true` will not block the scripts from running and
+  | instead report them to a URL.
+  |
+  */
+  reportOnly: false,
+}
+
+/*
+|--------------------------------------------------------------------------
+| CSRF Protection
+|--------------------------------------------------------------------------
+|
+| CSRF Protection adds another layer of security by making sure, actionable
+| routes does have a valid token to execute an action.
+|
+*/
+export const csrf: ShieldConfig['csrf'] = {
+  /*
+  |--------------------------------------------------------------------------
+  | Enable/Disable CSRF
+  |--------------------------------------------------------------------------
+  */
+  enabled: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Routes to Ignore
+  |--------------------------------------------------------------------------
+  |
+  | Define an array of route patterns that you want to ignore from CSRF
+  | validation. Make sure the route patterns are started with a leading
+  | slash. Example:
+  |
+  | `/foo/bar`
+	|
+	| Also you can define a function that is evaluated on every HTTP Request.
+	| ```
+	|  exceptRoutes: ({ request }) => request.url().includes('/api')
+	| ```
+  |
+  */
+  exceptRoutes: [],
+
+  /*
+  |--------------------------------------------------------------------------
+  | Enable Sharing Token Via Cookie
+  |--------------------------------------------------------------------------
+  |
+  | When the following flag is enabled, AdonisJS will drop `XSRF-TOKEN`
+  | cookie that frontend frameworks can read and return back as a
+  | `X-XSRF-TOKEN` header.
+  |
+  | The cookie has `httpOnly` flag set to false, so it is little insecure and
+  | can be turned off when you are not using a frontend framework making
+  | AJAX requests.
+  |
+  */
+  enableXsrfCookie: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Methods to Validate
+  |--------------------------------------------------------------------------
+  |
+  | Define an array of HTTP methods to be validated for a valid CSRF token.
+  |
+  */
+  methods: ['POST', 'PUT', 'PATCH', 'DELETE'],
+}
+
+/*
+|--------------------------------------------------------------------------
+| DNS Prefetching
+|--------------------------------------------------------------------------
+|
+| DNS prefetching allows browsers to proactively perform domain name
+| resolution in background.
+|
+| Learn more at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
+|
+*/
+export const dnsPrefetch: ShieldConfig['dnsPrefetch'] = {
+  /*
+  |--------------------------------------------------------------------------
+  | Enable/disable this feature
+  |--------------------------------------------------------------------------
+  */
+  enabled: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Allow or Dis-Allow Explicitly
+  |--------------------------------------------------------------------------
+  |
+  | The `enabled` boolean does not set `X-DNS-Prefetch-Control` header. However
+  | the `allow` boolean controls the value of `X-DNS-Prefetch-Control` header.
+  |
+  | - When `allow = true`, then `X-DNS-Prefetch-Control = 'on'`
+  | - When `allow = false`, then `X-DNS-Prefetch-Control = 'off'`
+  |
+  */
+  allow: true,
+}
+
+/*
+|--------------------------------------------------------------------------
+| Iframe Options
+|--------------------------------------------------------------------------
+|
+| xFrame defines whether or not your website can be embedded inside an
+| iframe. Choose from one of the following options.
+|
+| - DENY
+| - SAMEORIGIN
+| - ALLOW-FROM http://example.com
+|
+| Learn more at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+*/
+export const xFrame: ShieldConfig['xFrame'] = {
+  enabled: true,
+  action: 'DENY',
+}
+
+/*
+|--------------------------------------------------------------------------
+| Http Strict Transport Security
+|--------------------------------------------------------------------------
+|
+| A security to ensure that a browser always makes a connection over
+| HTTPS.
+|
+| Learn more at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+|
+*/
+export const hsts: ShieldConfig['hsts'] = {
+  enabled: true,
+  /*
+  |--------------------------------------------------------------------------
+  | Max Age
+  |--------------------------------------------------------------------------
+  |
+  | Control, how long the browser should remember that a site is only to be
+  | accessed using HTTPS.
+  |
+  */
+  maxAge: '180 days',
+
+  /*
+  |--------------------------------------------------------------------------
+  | Include Subdomains
+  |--------------------------------------------------------------------------
+  |
+  | Apply rules on the subdomains as well.
+  |
+  */
+  includeSubDomains: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Preloading
+  |--------------------------------------------------------------------------
+  |
+  | Google maintains a service to register your domain and it will preload
+  | the HSTS policy. Learn more https://hstspreload.org/
+  |
+  */
+  preload: false,
+}
+
+/*
+|--------------------------------------------------------------------------
+| No Sniff
+|--------------------------------------------------------------------------
+|
+| Browsers have a habit of sniffing content-type of a response. Which means
+| files with .txt extension containing Javascript code will be executed as
+| Javascript. You can disable this behavior by setting nosniff to false.
+|
+| Learn more at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
+|
+*/
+export const contentTypeSniffing: ShieldConfig['contentTypeSniffing'] = {
+  enabled: true,
+}
+
+
+## config/hash.ts
+
+/**
+ * Config source: https://git.io/JfefW
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import Env from '@ioc:Adonis/Core/Env'
+import { hashConfig } from '@adonisjs/core/build/config'
+
+/*
+|--------------------------------------------------------------------------
+| Hash Config
+|--------------------------------------------------------------------------
+|
+| The `HashConfig` relies on the `HashList` interface which is
+| defined inside `contracts` directory.
+|
+*/
+export default hashConfig({
+  /*
+  |--------------------------------------------------------------------------
+  | Default hasher
+  |--------------------------------------------------------------------------
+  |
+  | By default we make use of the argon hasher to hash values. However, feel
+  | free to change the default value
+  |
+  */
+  default: Env.get('HASH_DRIVER', 'scrypt'),
+
+  list: {
+    /*
+    |--------------------------------------------------------------------------
+    | scrypt
+    |--------------------------------------------------------------------------
+    |
+    | Scrypt mapping uses the Node.js inbuilt crypto module for creating
+    | hashes.
+    |
+    | We are using the default configuration recommended within the Node.js
+    | documentation.
+    | https://nodejs.org/api/crypto.html#cryptoscryptpassword-salt-keylen-options-callback
+    |
+    */
+    scrypt: {
+      driver: 'scrypt',
+      cost: 16384,
+      blockSize: 8,
+      parallelization: 1,
+      saltSize: 16,
+      keyLength: 64,
+      maxMemory: 32 * 1024 * 1024,
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Argon
+    |--------------------------------------------------------------------------
+    |
+    | Argon mapping uses the `argon2` driver to hash values.
+    |
+    | Make sure you install the underlying dependency for this driver to work.
+    | https://www.npmjs.com/package/phc-argon2.
+    |
+    | npm install phc-argon2
+    |
+    */
+    argon: {
+      driver: 'argon2',
+      variant: 'id',
+      iterations: 3,
+      memory: 4096,
+      parallelism: 1,
+      saltSize: 16,
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Bcrypt
+    |--------------------------------------------------------------------------
+    |
+    | Bcrypt mapping uses the `bcrypt` driver to hash values.
+    |
+    | Make sure you install the underlying dependency for this driver to work.
+    | https://www.npmjs.com/package/phc-bcrypt.
+    |
+    | npm install phc-bcrypt
+    |
+    */
+    bcrypt: {
+      driver: 'bcrypt',
+      rounds: 10,
+    },
+  },
+})
+
+
+## config/session.ts
+
+/**
+ * Config source: https://git.io/JeYHp
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import Env from '@ioc:Adonis/Core/Env'
+import Application from '@ioc:Adonis/Core/Application'
+import { sessionConfig } from '@adonisjs/session/build/config'
+
+export default sessionConfig({
+  /*
+  |--------------------------------------------------------------------------
+  | Enable/Disable sessions
+  |--------------------------------------------------------------------------
+  |
+  | Setting the following property to "false" will disable the session for the
+  | entire application
+  |
+  */
+  enabled: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Driver
+  |--------------------------------------------------------------------------
+  |
+  | The session driver to use. You can choose between one of the following
+  | drivers.
+  |
+  | - cookie (Uses signed cookies to store session values)
+  | - file (Uses filesystem to store session values)
+  | - redis (Uses redis. Make sure to install "@adonisjs/redis" as well)
+  |
+  | Note: Switching drivers will make existing sessions invalid.
+  |
+  */
+  driver: Env.get('SESSION_DRIVER'),
+
+  /*
+  |--------------------------------------------------------------------------
+  | Cookie name
+  |--------------------------------------------------------------------------
+  |
+  | The name of the cookie that will hold the session id.
+  |
+  */
+  cookieName: 'adonis-session',
+
+  /*
+  |--------------------------------------------------------------------------
+  | Clear session when browser closes
+  |--------------------------------------------------------------------------
+  |
+  | Whether or not you want to destroy the session when browser closes. Setting
+  | this value to `true` will ignore the `age`.
+  |
+  */
+  clearWithBrowser: false,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Session age
+  |--------------------------------------------------------------------------
+  |
+  | The duration for which session stays active after no activity. A new HTTP
+  | request to the server is considered as activity.
+  |
+  | The value can be a number in milliseconds or a string that must be valid
+  | as per https://npmjs.org/package/ms package.
+  |
+  | Example: `2 days`, `2.5 hrs`, `1y`, `5s` and so on.
+  |
+  */
+  age: '2h',
+
+  /*
+  |--------------------------------------------------------------------------
+  | Cookie values
+  |--------------------------------------------------------------------------
+  |
+  | The cookie settings are used to setup the session id cookie and also the
+  | driver will use the same values.
+  |
+  */
+  cookie: {
+    path: '/',
+    httpOnly: true,
+    sameSite: false,
+  },
+
+  /*
+  |--------------------------------------------------------------------------
+  | Configuration for the file driver
+  |--------------------------------------------------------------------------
+  |
+  | The file driver needs absolute path to the directory in which sessions
+  | must be stored.
+  |
+  */
+  file: {
+    location: Application.tmpPath('sessions'),
+  },
+
+  /*
+  |--------------------------------------------------------------------------
+  | Redis driver
+  |--------------------------------------------------------------------------
+  |
+  | The redis connection you want session driver to use. The same connection
+  | must be defined inside `config/redis.ts` file as well.
+  |
+  */
+  redisConnection: 'local',
+})
+
+
+## config/app.ts
+
+/**
+ * Config source: https://git.io/JfefZ
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import proxyAddr from 'proxy-addr'
+import Env from '@ioc:Adonis/Core/Env'
+import type { ServerConfig } from '@ioc:Adonis/Core/Server'
+import type { LoggerConfig } from '@ioc:Adonis/Core/Logger'
+import type { ProfilerConfig } from '@ioc:Adonis/Core/Profiler'
+import type { ValidatorConfig } from '@ioc:Adonis/Core/Validator'
+
+/*
+|--------------------------------------------------------------------------
+| Application secret key
+|--------------------------------------------------------------------------
+|
+| The secret to encrypt and sign different values in your application.
+| Make sure to keep the `APP_KEY` as an environment variable and secure.
+|
+| Note: Changing the application key for an existing app will make all
+| the cookies invalid and also the existing encrypted data will not
+| be decrypted.
+|
+*/
+export const appKey: string = Env.get('APP_KEY')
+
+/*
+|--------------------------------------------------------------------------
+| Http server configuration
+|--------------------------------------------------------------------------
+|
+| The configuration for the HTTP(s) server. Make sure to go through all
+| the config properties to make keep server secure.
+|
+*/
+export const http: ServerConfig = {
+  /*
+  |--------------------------------------------------------------------------
+  | Allow method spoofing
+  |--------------------------------------------------------------------------
+  |
+  | Method spoofing enables defining custom HTTP methods using a query string
+  | `_method`. This is usually required when you are making traditional
+  | form requests and wants to use HTTP verbs like `PUT`, `DELETE` and
+  | so on.
+  |
+  */
+  allowMethodSpoofing: false,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Subdomain offset
+  |--------------------------------------------------------------------------
+  */
+  subdomainOffset: 2,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Request Ids
+  |--------------------------------------------------------------------------
+  |
+  | Setting this value to `true` will generate a unique request id for each
+  | HTTP request and set it as `x-request-id` header.
+  |
+  */
+  generateRequestId: false,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Trusting proxy servers
+  |--------------------------------------------------------------------------
+  |
+  | Define the proxy servers that AdonisJs must trust for reading `X-Forwarded`
+  | headers.
+  |
+  */
+  trustProxy: proxyAddr.compile('loopback'),
+
+  /*
+  |--------------------------------------------------------------------------
+  | Generating Etag
+  |--------------------------------------------------------------------------
+  |
+  | Whether or not to generate an etag for every response.
+  |
+  */
+  etag: false,
+
+  /*
+  |--------------------------------------------------------------------------
+  | JSONP Callback
+  |--------------------------------------------------------------------------
+  */
+  jsonpCallbackName: 'callback',
+
+  /*
+  |--------------------------------------------------------------------------
+  | Cookie settings
+  |--------------------------------------------------------------------------
+  */
+  cookie: {
+    domain: '',
+    path: '/',
+    maxAge: '2h',
+    httpOnly: true,
+    secure: false,
+    sameSite: false,
+  },
+}
+
+/*
+|--------------------------------------------------------------------------
+| Logger
+|--------------------------------------------------------------------------
+*/
+export const logger: LoggerConfig = {
+  /*
+  |--------------------------------------------------------------------------
+  | Application name
+  |--------------------------------------------------------------------------
+  |
+  | The name of the application you want to add to the log. It is recommended
+  | to always have app name in every log line.
+  |
+  | The `APP_NAME` environment variable is automatically set by AdonisJS by
+  | reading the `name` property from the `package.json` file.
+  |
+  */
+  name: Env.get('APP_NAME'),
+
+  /*
+  |--------------------------------------------------------------------------
+  | Toggle logger
+  |--------------------------------------------------------------------------
+  |
+  | Enable or disable logger application wide
+  |
+  */
+  enabled: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Logging level
+  |--------------------------------------------------------------------------
+  |
+  | The level from which you want the logger to flush logs. It is recommended
+  | to make use of the environment variable, so that you can define log levels
+  | at deployment level and not code level.
+  |
+  */
+  level: Env.get('LOG_LEVEL', 'info'),
+
+  /*
+  |--------------------------------------------------------------------------
+  | Pretty print
+  |--------------------------------------------------------------------------
+  |
+  | It is highly advised NOT to use `prettyPrint` in production, since it
+  | can have huge impact on performance.
+  |
+  */
+  prettyPrint: Env.get('NODE_ENV') === 'development',
+}
+
+/*
+|--------------------------------------------------------------------------
+| Profiler
+|--------------------------------------------------------------------------
+*/
+export const profiler: ProfilerConfig = {
+  /*
+  |--------------------------------------------------------------------------
+  | Toggle profiler
+  |--------------------------------------------------------------------------
+  |
+  | Enable or disable profiler
+  |
+  */
+  enabled: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Blacklist actions/row labels
+  |--------------------------------------------------------------------------
+  |
+  | Define an array of actions or row labels that you want to disable from
+  | getting profiled.
+  |
+  */
+  blacklist: [],
+
+  /*
+  |--------------------------------------------------------------------------
+  | Whitelist actions/row labels
+  |--------------------------------------------------------------------------
+  |
+  | Define an array of actions or row labels that you want to whitelist for
+  | the profiler. When whitelist is defined, then `blacklist` is ignored.
+  |
+  */
+  whitelist: [],
+}
+
+/*
+|--------------------------------------------------------------------------
+| Validator
+|--------------------------------------------------------------------------
+|
+| Configure the global configuration for the validator. Here's the reference
+| to the default config https://git.io/JT0WE
+|
+*/
+export const validator: ValidatorConfig = {
+}
+
+
+## config/bodyparser.ts
+
+/**
+ * Config source: https://git.io/Jfefn
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import type { BodyParserConfig } from '@ioc:Adonis/Core/BodyParser'
+
+const bodyParserConfig: BodyParserConfig = {
+  /*
+  |--------------------------------------------------------------------------
+  | White listed methods
+  |--------------------------------------------------------------------------
+  |
+  | HTTP methods for which body parsing must be performed. It is a good practice
+  | to avoid body parsing for `GET` requests.
+  |
+  */
+  whitelistedMethods: ['POST', 'PUT', 'PATCH', 'DELETE'],
+	  /*
+  |--------------------------------------------------------------------------
+  | Allow method spoofing
+  |--------------------------------------------------------------------------
+  |
+  | Method spoofing enables defining custom HTTP methods using a query string
+  | `_method`. This is usually required when you are making traditional
+  | form requests and wants to use HTTP verbs like PUT, DELETE and
+  | so on.
+  |
+  */
+  allowMethodSpoofing: true,
+  /*
+  |--------------------------------------------------------------------------
+  | JSON parser settings
+  |--------------------------------------------------------------------------
+  |
+  | The settings for the JSON parser. The types defines the request content
+  | types which gets processed by the JSON parser.
+  |
+  */
+  json: {
+    encoding: 'utf-8',
+    limit: '1mb',
+    strict: true,
+    types: [
+      'application/json',
+      'application/json-patch+json',
+      'application/vnd.api+json',
+      'application/csp-report',
+    ],
+  },
+
+  /*
+  |--------------------------------------------------------------------------
+  | Form parser settings
+  |--------------------------------------------------------------------------
+  |
+  | The settings for the `application/x-www-form-urlencoded` parser. The types
+  | defines the request content types which gets processed by the form parser.
+  |
+  */
+  form: {
+    encoding: 'utf-8',
+    limit: '1mb',
+    queryString: {},
+
+    /*
+    |--------------------------------------------------------------------------
+    | Convert empty strings to null
+    |--------------------------------------------------------------------------
+    |
+    | Convert empty form fields to null. HTML forms results in field string
+    | value when the field is left blank. This option normalizes all the blank
+    | field values to "null"
+    |
+    */
+    convertEmptyStringsToNull: true,
+
+    types: [
+      'application/x-www-form-urlencoded',
+    ],
+  },
+
+  /*
+  |--------------------------------------------------------------------------
+  | Raw body parser settings
+  |--------------------------------------------------------------------------
+  |
+  | Raw body just reads the request body stream as a plain text, which you
+  | can process by hand. This must be used when request body type is not
+  | supported by the body parser.
+  |
+  */
+  raw: {
+    encoding: 'utf-8',
+    limit: '1mb',
+    queryString: {},
+    types: [
+      'text/*',
+    ],
+  },
+
+  /*
+  |--------------------------------------------------------------------------
+  | Multipart parser settings
+  |--------------------------------------------------------------------------
+  |
+  | The settings for the `multipart/form-data` parser. The types defines the
+  | request content types which gets processed by the form parser.
+  |
+  */
+  multipart: {
+    /*
+    |--------------------------------------------------------------------------
+    | Auto process
+    |--------------------------------------------------------------------------
+    |
+    | The auto process option will process uploaded files and writes them to
+    | the `tmp` folder. You can turn it off and then manually use the stream
+    | to pipe stream to a different destination.
+    |
+    | It is recommended to keep `autoProcess=true`. Unless you are processing bigger
+    | file sizes.
+    |
+    */
+    autoProcess: true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Files to be processed manually
+    |--------------------------------------------------------------------------
+    |
+    | You can turn off `autoProcess` for certain routes by defining
+    | routes inside the following array.
+    |
+    | NOTE: Make sure the route pattern starts with a leading slash.
+    |
+    | Correct
+    | ```js
+    | /projects/:id/file
+    | ```
+    |
+    | Incorrect
+    | ```js
+    | projects/:id/file
+    | ```
+    */
+    processManually: [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Temporary file name
+    |--------------------------------------------------------------------------
+    |
+    | When auto processing is on. We will use this method to compute the temporary
+    | file name. AdonisJs will compute a unique `tmpPath` for you automatically,
+    | However, you can also define your own custom method.
+    |
+    */
+    // tmpFileName () {
+    // },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Encoding
+    |--------------------------------------------------------------------------
+    |
+    | Request body encoding
+    |
+    */
+    encoding: 'utf-8',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Convert empty strings to null
+    |--------------------------------------------------------------------------
+    |
+    | Convert empty form fields to null. HTML forms results in field string
+    | value when the field is left blank. This option normalizes all the blank
+    | field values to "null"
+    |
+    */
+    convertEmptyStringsToNull: true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Max Fields
+    |--------------------------------------------------------------------------
+    |
+    | The maximum number of fields allowed in the request body. The field includes
+    | text inputs and files both.
+    |
+    */
+    maxFields: 1000,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Request body limit
+    |--------------------------------------------------------------------------
+    |
+    | The total limit to the multipart body. This includes all request files
+    | and fields data.
+    |
+    */
+    limit: '20mb',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Types
+    |--------------------------------------------------------------------------
+    |
+    | The types that will be considered and parsed as multipart body.
+    |
+    */
+    types: [
+      'multipart/form-data',
+    ],
+  },
+	  /*
+  |--------------------------------------------------------------------------
+  | Method Override
+  |--------------------------------------------------------------------------
+  |
+  | Method override allows you to use HTTP verbs such as PUT, PATCH and DELETE
+  | in HTML forms by defining a `_method` input field.
+  |
+  */
+  methodOverride: {
+    enabled: true,
+    methodField: '_method',
+  },
+}
+
+export default bodyParserConfig
+
+
+## config/static.ts
+
+/**
+ * Config source: https://git.io/Jfefl
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import { AssetsConfig } from '@ioc:Adonis/Core/Static'
+
+const staticConfig: AssetsConfig = {
+  /*
+  |--------------------------------------------------------------------------
+  | Enabled
+  |--------------------------------------------------------------------------
+  |
+  | A boolean to enable or disable serving static files. The static files
+  | are served from the `public` directory inside the application root.
+  | However, you can override the default path inside `.adonisrc.json`
+  | file.
+  |
+  |
+  */
+  enabled: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Handling Dot Files
+  |--------------------------------------------------------------------------
+  |
+  | Decide how you want the static assets server to handle the `dotfiles`.
+  | By default, we ignore them as if they don't exists. However, you
+  | can choose between one of the following options.
+  |
+  | - ignore: Behave as if the file doesn't exists. Results in 404.
+  | - deny: Deny access to the file. Results in 403.
+  | - allow: Serve the file contents
+  |
+  */
+  dotFiles: 'ignore',
+
+  /*
+  |--------------------------------------------------------------------------
+  | Generating Etag
+  |--------------------------------------------------------------------------
+  |
+  | Handle whether or not to generate etags for the files. Etag allows browser
+  | to utilize the cache when file hasn't been changed.
+  |
+  */
+  etag: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Set Last Modified
+  |--------------------------------------------------------------------------
+  |
+  | Whether or not to set the `Last-Modified` header in the response. Uses
+  | the file system's last modified value.
+  |
+  */
+  lastModified: true,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Max age
+  |--------------------------------------------------------------------------
+  |
+  | Set the value for the max-age directive. Set a higher value in production
+  | if you fingerprint your assets.
+  |
+  | Learn more: https://docs.adonisjs.com/guides/deployment#serving-static-assets
+  |
+  */
+  maxAge: 0,
+
+  /*
+  |--------------------------------------------------------------------------
+  | Immutable
+  |--------------------------------------------------------------------------
+  |
+  | Set the immutable directive. Set it to `true` if the assets are generated
+  | with a fingerprint. In others words the file name changes when the file
+  | contents change.
+  |
+  */
+  immutable: false,
+}
+
+export default staticConfig
+
+
+## config/database.ts
+
+/**
+ * Config source: https://git.io/JesV9
+ *
+ * Feel free to let us know via PR, if you find something broken in this config
+ * file.
+ */
+
+import Env from '@ioc:Adonis/Core/Env'
+import Application from '@ioc:Adonis/Core/Application'
+import type { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
+
+const databaseConfig: DatabaseConfig = {
+  /*
+  |--------------------------------------------------------------------------
+  | Connection
+  |--------------------------------------------------------------------------
+  |
+  | The primary connection for making database queries across the application
+  | You can use any key from the `connections` object defined in this same
+  | file.
+  |
+  */
+  connection: Env.get('DB_CONNECTION'),
+
+  connections: {
+    /*
+    |--------------------------------------------------------------------------
+    | SQLite
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the SQLite database.  Make sure to install the driver
+    | from npm when using this connection
+    |
+    | npm i sqlite3
+    |
+    */
+    sqlite: {
+      client: 'sqlite',
+      connection: {
+        filename: Application.tmpPath('db.sqlite3'),
+      },
+      pool: {
+        afterCreate: (conn, cb) => {
+          conn.run('PRAGMA foreign_keys=true', cb)
+        }
+      },
+      migrations: {
+        naturalSort: true,
+      },
+      useNullAsDefault: true,
+      healthCheck: false,
+      debug: false,
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | PostgreSQL config
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for PostgreSQL database. Make sure to install the driver
+    | from npm when using this connection
+    |
+    | npm i pg
+    |
+    */
+    pg: {
+      client: 'pg',
+      connection: {
+        host: Env.get('PG_HOST'),
+        port: Env.get('PG_PORT'),
+        user: Env.get('PG_USER'),
+        password: Env.get('PG_PASSWORD', ''),
+        database: Env.get('PG_DB_NAME'),
+      },
+      migrations: {
+        naturalSort: true,
+      },
+      healthCheck: false,
+      debug: false,
+    },
+
+  }
+}
+
+export default databaseConfig
 
 
 
@@ -1939,8 +3441,13 @@ Modifier plante
 @end
 
 @section('content')
-	<h1>Modifier la plante</h1>
-	@include('admin/plants/_form', { plant: plant, action: route('AdminPlantsController.update', { id: plant.id }), method: 'PUT' })
+	<div class="container mt-4">
+		<h1 class="mb-4">Modifier une plante</h1>
+
+		@set('action', route('admin.plants.update', { id: plante.id }))
+		@set('method', 'PUT')
+		@include('admin/plants/_form')
+	</div>
 @end
 
 
@@ -1954,7 +3461,7 @@ Nouvelle plante
 
 @section('content')
 	<h1>Créer une plante</h1>
-	@include('admin/plants/_form', { plant: null, action: route('AdminPlantsController.store'), method: 'POST' })
+	@include('admin/plants/_form', { plant: {}, action: route('admin.plants.store'), method: 'POST' })
 @end
 
 
@@ -1967,30 +3474,40 @@ Gestion des plantes
 @end
 
 @section('content')
-	<h1>Plantes (admin)</h1>
-	<a href="{{ route('AdminPlantsController.create') }}">Nouvelle plante</a>
-	<table>
-		<thead>
+	<h1 class="mb-4">Gestion des Plantes</h1>
+
+	<div class="mb-3">
+		<a href="{{ route('admin.plants.create') }}" class="btn btn-outline-success">Nouvelle Plante</a>
+	</div>
+
+	<table class="table table-striped table-hover">
+		<thead class="table-light">
 			<tr>
 				<th>Nom</th>
 				<th>Prix</th>
 				<th>Stock</th>
-				<th>Actions</th>
+				<th class="text-center">Actions</th>
 			</tr>
 		</thead>
 		<tbody>
-			@each(plant in plants)
+			@each(plant in plantes)
 				<tr>
-					<td>{{ plant.name }}</td>
+					<td>
+						<a href="{{ route('plants.show', { id: plant.id }) }}" class="text-decoration-none text-dark">
+							{{ plant.name }}
+						</a>
+					</td>
 					<td>{{ plant.price }} €</td>
 					<td>{{ plant.stock }}</td>
-					<td>
-						<a href="{{ route('AdminPlantsController.edit', { id: plant.id }) }}">Modifier</a>
-						<form method="POST" action="{{ route('AdminPlantsController.destroy', { id: plant.id }) }}" style="display:inline">
-							{{ csrfField() }}
-							<input type="hidden" name="_method" value="DELETE">
-							<button type="submit" onclick="return confirm('Supprimer cette plante ?')">Supprimer</button>
-						</form>
+					<td class="text-center">
+						<div class="d-flex justify-content-center gap-2">
+							<a href="{{ route('admin.plants.edit', { id: plant.id }) }}" class="btn btn-warning btn-sm">✏ Modifier</a>
+							<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }) }}"
+										onsubmit="return confirm('Voulez-vous supprimer cette plante ?')">
+								{{ csrfField() }}
+								<button type="submit" class="btn btn-danger">Supprimer</button>
+							</form>
+						</div>
 					</td>
 				</tr>
 			@endeach
@@ -1999,30 +3516,55 @@ Gestion des plantes
 @end
 
 
+## resources/views/admin/plants/create.edge
+
+@layout('layouts/application')
+
+@section('title')
+Créer une plante
+@end
+
+@section('content')
+	<div class="container mt-4">
+		<h1 class="mb-4">Nouvelle plante</h1>
+
+		@set('action', route('admin.plants.store'))
+		@set('method', 'POST')
+		@set('plante', { name: '', price: '', description: '', stock: '' })
+		@include('admin/plants/_form')
+	</div>
+@end
+
+
 ## resources/views/admin/plants/_form.edge
 
 <form method="POST" action="{{ action }}">
 	{{ csrfField() }}
-	@if(method !== 'POST')
-		<input type="hidden" name="_method" value="{{ method }}">
-	@end
-	<div>
-		<label>Nom</label>
-		<input type="text" name="name" value="{{ plant ? plant.name : '' }}" required>
+	<input type="hidden" name="_method" value="{{ method }}">
+
+	<div class="mb-3">
+		<label for="name" class="form-label">Nom de la plante</label>
+		<input type="text" name="name" id="name" value="{{ plante.name }}" class="form-control" required>
 	</div>
-	<div>
-		<label>Prix (€)</label>
-		<input type="number" name="price" value="{{ plant ? plant.price : '' }}" min="0" step="0.01" required>
+
+	<div class="mb-3">
+		<label for="price" class="form-label">Prix (€)</label>
+		<input type="number" name="price" id="price" value="{{ plante.price }}" step="0.01" class="form-control" required>
 	</div>
-	<div>
-		<label>Description</label>
-		<textarea name="description" required>{{ plant ? plant.description : '' }}</textarea>
+
+	<div class="mb-3">
+		<label for="description" class="form-label">Description</label>
+		<textarea name="description" id="description" rows="5" class="form-control">{{ plante.description }}</textarea>
 	</div>
-	<div>
-		<label>Stock</label>
-		<input type="number" name="stock" value="{{ plant ? plant.stock : '' }}" min="0" required>
+
+	<div class="mb-3">
+		<label for="stock" class="form-label">Stock</label>
+		<input type="number" name="stock" id="stock" value="{{ plante.stock }}" class="form-control" required>
 	</div>
-	<button type="submit">Enregistrer</button>
+
+	<button type="submit" class="btn btn-primary">
+		{{ plante.id ? 'Mettre à jour' : 'Créer' }}
+	</button>
 </form>
 
 
@@ -2055,15 +3597,28 @@ Modifier l’utilisateur
 @end
 
 @section('content')
-<h1>Modifier l’utilisateur</h1>
-<form method="POST" action="{{ route('admin.users.update', { id: user.id }) }}">
-	{{ csrfField() }}
-	<input type="hidden" name="_method" value="PUT">
-	<label>Nom : <input type="text" name="name" value="{{ user.name }}"></label><br>
-	<label>Email : <input type="email" name="email" value="{{ user.email }}"></label><br>
-	<label>Admin : <input type="checkbox" name="admin" {{ user.admin ? 'checked' : '' }}></label><br>
-	<button type="submit">Valider</button>
-</form>
+	<h1>Modifier l’utilisateur</h1>
+	<form method="POST" action="{{ route('admin.users.update', { id: utilisateur.id }) }}">
+		{{ csrfField() }}
+		<input type="hidden" name="_method" value="PUT">
+
+		<div class="mb-3">
+			<label for="email" class="form-label">Email</label>
+			<input type="email" id="email" name="email" class="form-control" value="{{ utilisateur.email }}" required>
+		</div>
+
+		<div class="mb-3">
+			<label for="name" class="form-label">Nom</label>
+			<input type="text" id="name" name="name" class="form-control" value="{{ utilisateur.name }}" required>
+		</div>
+
+		<div class="mb-3 form-check">
+			<input type="checkbox" id="admin" name="admin" class="form-check-input" {{ utilisateur.admin ? 'checked' : '' }}>
+			<label for="admin" class="form-check-label">Administrateur</label>
+		</div>
+
+		<button type="submit" class="btn btn-primary">Enregistrer</button>
+	</form>
 @end
 
 
@@ -2076,32 +3631,44 @@ Liste des utilisateurs
 @end
 
 @section('content')
-<h1>Liste des utilisateurs</h1>
-<table>
-	<thead>
-		<tr>
-			<th>ID</th>
-			<th>Nom</th>
-			<th>Email</th>
-			<th>Admin</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		@each(user in users)
-		<tr>
-			<td>{{ user.id }}</td>
-			<td>{{ user.name }}</td>
-			<td>{{ user.email }}</td>
-			<td>{{ user.admin ? 'Oui' : 'Non' }}</td>
-			<td>
-				<a href="{{ route('admin.users.show', { id: user.id }) }}">Afficher</a>
-				<a href="{{ route('admin.users.edit', { id: user.id }) }}">Modifier</a>
-			</td>
-		</tr>
-		@endeach
-	</tbody>
-</table>
+	<h1 class="mb-4">Gestion des Utilisateurs</h1>
+
+	<table class="table table-striped table-hover">
+		<thead class="table-light">
+			<tr>
+				<th>Nom</th>
+				<th>Email</th>
+				<th>Administrateur</th>
+				<th class="text-center">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@each(user in utilisateurs)
+				<tr>
+					<td>
+						<a href="{{ route('admin.users.show', { id: user.id }) }}" class="text-decoration-none text-dark">
+							{{ user.name }}
+						</a>
+					</td>
+					<td>{{ user.email }}</td>
+					<td>
+						<span class="badge {{ user.admin ? 'bg-success' : 'bg-secondary' }}">
+							{{ user.admin ? 'Oui' : 'Non' }}
+						</span>
+					</td>
+					<td class="text-center">
+						<div class="d-flex justify-content-center gap-2">
+							<a href="{{ route('admin.users.edit', { id: user.id }) }}" class="btn btn-warning btn-sm">✏ Modifier</a>
+							<form method="POST" action="{{ route('admin.users.destroy', { id: user.id }) }}" class="d-inline">
+								{{ csrfField() }}
+								<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet utilisateur ?')">🗑 Supprimer</button>
+							</form>
+						</div>
+					</td>
+				</tr>
+			@endeach
+		</tbody>
+	</table>
 @end
 
 
@@ -2110,28 +3677,28 @@ Liste des utilisateurs
 @layout('layouts/application')
 
 @section('title')
-{{ plante.name }}
+{{ plant.name }}
 @end
 
 @section('content')
 <div class="card shadow-lg">
 	<div class="card-body">
-		<h1 class="card-title">{{ plante.name }}</h1>
-		<p><strong>Prix :</strong> {{ plante.price }} €</p>
-		<p><strong>Description :</strong> {{ plante.description }}</p>
+		<h1 class="card-title">{{ plant.name }}</h1>
+		<p><strong>Prix :</strong> {{ plant.price }} €</p>
+		<p><strong>Description :</strong> {{ plant.description }}</p>
 		@if(auth.user?.admin)
-			<p><strong>Stock :</strong> {{ plante.stock }} unités</p>
+			<p><strong>Stock :</strong> {{ plant.stock }} unités</p>
 		@end
 		<div class="d-flex flex-wrap gap-2 mb-2">
 			<button class="btn btn-success"
-				onclick="cartInstance.add({{ plante.id }}, '{{ plante.name }}', {{ plante.price }}, {{ plante.stock }})">
+				onclick="cartInstance.add({{ plant.id }}, '{{ plant.name }}', {{ plant.price }}, {{ plant.stock }})">
 				Ajouter au panier
 			</button>
 			@if(auth.user?.admin)
-				<a href="{{ route('AdminPlantsController.edit', { id: plante.id }) }}" class="btn btn-warning">Modifier</a>
-				<form method="POST" action="{{ route('AdminPlantsController.destroy', { id: plante.id }) }}" class="d-inline" onsubmit="return confirm('Supprimer cette plante ?')">
+				<a href="{{ route('admin.plants.edit', { id: plant.id }) }}" class="btn btn-warning">Modifier</a>
+				<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }) }}"
+							onsubmit="return confirm('Voulez-vous supprimer cette plante ?')">
 					{{ csrfField() }}
-					<input type="hidden" name="_method" value="DELETE">
 					<button type="submit" class="btn btn-danger">Supprimer</button>
 				</form>
 			@end
@@ -2174,15 +3741,8 @@ Liste des plantes
 <h1 class="text-center mb-4">🌿 Liste des Plantes</h1>
 
 @if(auth.user && auth.user.admin)
-	<a href="{{ route('Admin/PlantsController.create') }}" class="btn btn-info mb-3">Nouvelle Plante</a>
+	<a href="{{ route('Admin/PlantsController.create') }}" class="btn btn-success mb-3">Nouvelle Plante</a>
 @endif
-
-@if(auth.user)
-	<p>Connecté en tant que : {{ auth.user.email }} ({{ auth.user.admin ? 'admin' : 'user' }})</p>
-@else
-	<p>Non connecté</p>
-@endif
-
 
 <div class="row">
 	@each(plant in plants)
@@ -2224,6 +3784,45 @@ Mon panier
 	<h1>Mon Panier</h1>
 	<div id="cart-container"></div>
 @endsection
+
+
+## resources/views/orders/show.edge
+
+@layout('layouts/application')
+
+@section('title')
+{{ plant.name }}
+@end
+
+@section('content')
+<div class="card shadow-lg">
+	<div class="card-body">
+		<h1 class="card-title">{{ plant.name }}</h1>
+		<p><strong>Prix :</strong> {{ plant.price }} €</p>
+		<p><strong>Description :</strong> {{ plant.description }}</p>
+		@if(auth.user?.admin)
+			<p><strong>Stock :</strong> {{ plant.stock }} unités</p>
+		@end
+		<div class="d-flex flex-wrap gap-2 mb-2">
+			<button class="btn btn-success"
+				onclick="cartInstance.add({{ plant.id }}, '{{ plant.name }}', {{ plant.price }}, {{ plant.stock }})">
+				Ajouter au panier
+			</button>
+			@if(auth.user?.admin)
+				<a href="{{ route('admin.plants.edit', { id: plant.id }) }}">Modifier</a>
+				<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }) }}" class="d-inline" onsubmit="return confirm('Supprimer cette plante ?')">
+					{{ csrfField() }}
+					<input type="hidden" name="_method" value="DELETE">
+					<button type="submit" class="btn btn-danger">Supprimer</button>
+				</form>
+			@end
+		</div>
+		<div class="mt-3">
+			<a href="{{ route('PlantsController.index') }}" class="btn btn-secondary">Retour à la liste</a>
+		</div>
+	</div>
+</div>
+@end
 
 
 ## resources/views/orders/new.edge
@@ -2311,6 +3910,14 @@ Commande créée
 @end
 
 
+## resources/views/orders/_order_card copy.edge
+
+<div>
+	<p>Commande #{{ order.id }} - {{ order.totalPrice }} €</p>
+	<p>Status : {{ order.status }}</p>
+</div>
+
+
 ## resources/views/layouts/_flash_messages.edge
 
 {{-- @if(flashMessages?.all())
@@ -2362,12 +3969,12 @@ Commande créée
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav ms-auto">
 				@if(auth.user && auth.user.name)
-					<li class="nav-item d-flex align-items-center text-white me-3">
-						{{ auth.user.name.split(' ').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') }}
-						@if(typeof auth.user.admin !== 'undefined' && auth.user.admin)
-							(Administrateur)
-						@endif
-					</li>
+				<li class="nav-item d-flex align-items-center text-white me-3">
+					{{ auth.user.name.split(' ').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') }}
+					@if(typeof auth.user.admin !== 'undefined' && auth.user.admin)
+					(Administrateur)
+					@endif
+				</li>
 				@endif
 
 				<li class="nav-item">
@@ -2375,34 +3982,34 @@ Commande créée
 				</li>
 
 				@if(auth.user)
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('orders.index') }}">Mes Commandes</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('users.show', { id: auth.user.id }) }}">Mon Profil</a>
-					</li>
-					@if(auth.user.admin)
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Admin</a>
-							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="{{ route('admin.plants.index') }}">Gestion des Plantes</a></li>
-								<li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Gestion des Utilisateurs</a></li>
-							</ul>
-						</li>
-					@endif
-					<li class="nav-item">
-						<form method="POST" action="{{ route('logout') }}">
-							{{ csrfField() }}
-							<button type="submit" class="nav-link btn btn-link p-0" style="text-decoration: none;">Déconnexion</button>
-						</form>
-					</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ route('orders.index') }}">Mes Commandes</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ route('users.show', { id: auth.user.id }) }}">Mon Profil</a>
+				</li>
+				@if(auth.user.admin)
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Admin</a>
+					<ul class="dropdown-menu">
+						<li><a class="dropdown-item" href="{{ route('admin.plants.index') }}">Gestion des Plantes</a></li>
+						<li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Gestion des Utilisateurs</a></li>
+					</ul>
+				</li>
+				@endif
+				<li class="nav-item logout-item">
+					<form method="POST" action="{{ route('logout') }}">
+						{{ csrfField() }}
+						<button type="submit" class="nav-link">Déconnexion</button>
+					</form>
+				</li>
 				@else
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('register.show') }}">S'inscrire</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('login.show') }}">Se Connecter</a>
-					</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ route('register.show') }}">S'inscrire</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{{ route('login.show') }}">Se Connecter</a>
+				</li>
 				@endif
 			</ul>
 		</div>
@@ -2506,9 +4113,13 @@ Mon profil
 
 @section('content')
 	<h1>Profil</h1>
-	<p><strong>Nom :</strong> {{ utilisateur.name }}</p>
+	@if(utilisateur.name)
+		<p><strong>Nom :</strong> {{ utilisateur.name }}</p>
+	@endif
+
 	<p><strong>Email :</strong> {{ utilisateur.email }}</p>
-	<a href="{{ route('UsersController.edit', { id: utilisateur.id }) }}">Modifier</a>
+
+	<a href="{{ route('UsersController.edit', { id: utilisateur.id }) }}" class="btn btn-primary">Modifier mon profil</a>
 @end
 
 
@@ -2525,15 +4136,28 @@ Modifier mon profil
 	<form method="POST" action="{{ route('UsersController.update', { id: utilisateur.id }) }}">
 		{{ csrfField() }}
 		<input type="hidden" name="_method" value="PUT">
-		<div>
-			<label>Nom</label>
-			<input type="text" name="name" value="{{ utilisateur.name }}" required>
+
+		@if(utilisateur.errors && Object.keys(utilisateur.errors).length)
+			<div class="alert alert-danger">
+				<ul>
+					@each(error in Object.values(utilisateur.errors).flat())
+						<li>{{ error }}</li>
+					@end
+				</ul>
+			</div>
+		@endif
+
+		<div class="mb-3">
+			<label for="email" class="form-label">Email</label>
+			<input type="email" name="email" id="email" value="{{ utilisateur.email }}" class="form-control" required>
 		</div>
-		<div>
-			<label>Email</label>
-			<input type="email" name="email" value="{{ utilisateur.email }}" required>
+
+		<div class="mb-3">
+			<label for="name" class="form-label">Nom</label>
+			<input type="text" name="name" id="name" value="{{ utilisateur.name }}" class="form-control" required>
 		</div>
-		<button type="submit">Mettre à jour</button>
+
+		<button type="submit" class="btn btn-primary">Enregistrer</button>
 	</form>
 @end
 
@@ -2799,13 +4423,14 @@ export default listDirectoryFiles(__dirname, Application.appRoot, ['./commands/i
       1 ## .adonisrc.json
      14 ## app
       1 ## commands
+     10 ## config
       6 ## contracts
       3 ## database
       1 ## .env.example
       1 ## env.ts
       1 ## package.json
       1 ## providers
-     25 ## resources
+     28 ## resources
       1 ## server.ts
       2 ## start
       1 ## tsconfig.json

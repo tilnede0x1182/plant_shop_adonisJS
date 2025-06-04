@@ -44,9 +44,20 @@ Route.group(() => {
 
 // Administration
 Route.group(() => {
-  Route.resource('plants', 'Admin/PlantsController').except(['show'])
-  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit', 'update', 'destroy'])
+  // Plantes
+  Route.resource('plants', 'Admin/PlantsController').except(['show', 'destroy'])
+
+  // Route POST pour suppression plantes
+  Route.post('/plants/:id/delete', 'Admin/PlantsController.destroy')
+    .as('plants.destroy')
+
+  // Utilisateurs
+  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit', 'update'])
+
+  // Route POST pour suppression utilisateurs
+  Route.post('/users/:id/delete', 'Admin/UsersController.destroy')
+    .as('users.destroy')
 })
-  .prefix('/admin')
+  .prefix('admin')
   .as('admin')
   .middleware('auth')

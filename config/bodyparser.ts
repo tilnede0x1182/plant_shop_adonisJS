@@ -18,7 +18,18 @@ const bodyParserConfig: BodyParserConfig = {
   |
   */
   whitelistedMethods: ['POST', 'PUT', 'PATCH', 'DELETE'],
-
+	  /*
+  |--------------------------------------------------------------------------
+  | Allow method spoofing
+  |--------------------------------------------------------------------------
+  |
+  | Method spoofing enables defining custom HTTP methods using a query string
+  | `_method`. This is usually required when you are making traditional
+  | form requests and wants to use HTTP verbs like PUT, DELETE and
+  | so on.
+  |
+  */
+  allowMethodSpoofing: true,
   /*
   |--------------------------------------------------------------------------
   | JSON parser settings
@@ -205,6 +216,19 @@ const bodyParserConfig: BodyParserConfig = {
     types: [
       'multipart/form-data',
     ],
+  },
+	  /*
+  |--------------------------------------------------------------------------
+  | Method Override
+  |--------------------------------------------------------------------------
+  |
+  | Method override allows you to use HTTP verbs such as PUT, PATCH and DELETE
+  | in HTML forms by defining a `_method` input field.
+  |
+  */
+  methodOverride: {
+    enabled: true,
+    methodField: '_method',
   },
 }
 

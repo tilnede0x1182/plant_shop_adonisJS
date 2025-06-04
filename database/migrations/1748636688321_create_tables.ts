@@ -22,7 +22,7 @@ export default class extends BaseSchema {
 
 		this.schema.createTable('orders', (table) => {
 			table.increments('id')
-			table.integer('user_id').unsigned().references('id').inTable('users')
+			table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
 			table.integer('total_price')
 			table.string('status')
 			table.timestamps(true)
@@ -30,8 +30,8 @@ export default class extends BaseSchema {
 
 		this.schema.createTable('order_items', (table) => {
 			table.increments('id')
-			table.integer('order_id').unsigned().references('id').inTable('orders')
-			table.integer('plant_id').unsigned().references('id').inTable('plants')
+			table.integer('order_id').unsigned().references('id').inTable('orders').onDelete('CASCADE')
+			table.integer('plant_id').unsigned().references('id').inTable('plants').onDelete('CASCADE')
 			table.integer('quantity')
 			table.timestamps(true)
 		})
