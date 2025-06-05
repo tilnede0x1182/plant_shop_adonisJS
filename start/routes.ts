@@ -31,7 +31,10 @@ Route.get('/', 'PlantsController.index').as('home')
 // Routes nécessitant une authentification
 Route.group(() => {
   // Profil personnel
-  Route.resource('users', 'UsersController').only(['show', 'edit', 'update'])
+  Route.resource('users', 'UsersController').only(['show', 'edit'])
+
+	// Route Post pour update
+	Route.post('/users/:id/update', 'UsersController.update').as('users.update')
 
   // Panier
   Route.resource('carts', 'CartsController').only(['index'])
@@ -45,14 +48,20 @@ Route.group(() => {
 // Administration
 Route.group(() => {
   // Plantes
-  Route.resource('plants', 'Admin/PlantsController').except(['show', 'destroy'])
+  Route.resource('plants', 'Admin/PlantsController').except(['show', 'destroy', 'update'])
+
+	// Route POST pour modification utilisateurs (update)
+  Route.post('/users/:id/update', 'Admin/PlantsController.update').as('plants.update')
 
   // Route POST pour suppression plantes
   Route.post('/plants/:id/delete', 'Admin/PlantsController.destroy')
     .as('plants.destroy')
 
   // Utilisateurs
-  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit', 'update'])
+  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit'])
+
+	// Route POST pour modification utilisateurs (update)
+  Route.post('/users/:id/admin_update', 'Admin/UsersController.update').as('users.update')
 
   // Route POST pour suppression utilisateurs
   Route.post('/users/:id/delete', 'Admin/UsersController.destroy')
