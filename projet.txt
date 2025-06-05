@@ -1099,66 +1099,75 @@ export default class UsersController {
 
 // app/Controllers/Http/Admin/PlantsController.ts
 
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Plant from 'App/Models/Plant'
+import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import Plant from "App/Models/Plant";
 
 /**
  * Contrôleur d’administration des plantes
  */
 export default class PlantsController {
-	/**
-	 * Liste toutes les plantes (admin)
-	 */
-	public async index({ view }: HttpContextContract) {
-		const plantes = await Plant.query().orderBy('name', 'asc')
-		return view.render('admin/plants/index', { plantes: plantes })
-	}
+  /**
+   * Liste toutes les plantes (admin)
+   */
+  public async index({ view }: HttpContextContract) {
+    // const plantes = await Plant.query().orderBy("name", "asc");
 
-	/**
-	 * Formulaire création plante
-	 */
-	public async create({ view }: HttpContextContract) {
-		return view.render('admin/plants/create')
-	}
+    const plantes = await Plant.query()
+      .orderBy("name", "asc")
+      .orderBy("id", "asc"); // Tri secondaire pour stabilité
+    return view.render("admin/plants/index", { plantes: plantes });
+  }
 
-	/**
-	 * Création plante
-	 */
-	public async store({ request, response, session }: HttpContextContract) {
-		const data = request.only(['name', 'price', 'description', 'stock'])
-		await Plant.create(data)
-		session.flash({ notification: 'Plante créée.' })
-		return response.redirect().toRoute('admin.plants.index')
-	}
+  /**
+   * Formulaire création plante
+   */
+  public async create({ view }: HttpContextContract) {
+    return view.render("admin/plants/create");
+  }
 
-	/**
-	 * Formulaire édition plante
-	 */
-	public async edit({ params, view }: HttpContextContract) {
-		const plante = await Plant.findOrFail(params.id)
-		return view.render('admin/plants/edit', { plante })
-	}
+  /**
+   * Création plante
+   */
+  public async store({ request, response, session }: HttpContextContract) {
+    const data = request.only(["name", "price", "description", "stock"]);
+    await Plant.create(data);
+    session.flash({ notification: "Plante créée." });
+    return response.redirect().toRoute("admin.plants.index");
+  }
 
-	/**
-	 * MAJ plante
-	 */
-	public async update({ params, request, response, session }: HttpContextContract) {
-		const plante = await Plant.findOrFail(params.id)
-		plante.merge(request.only(['name', 'price', 'description', 'stock']))
-		await plante.save()
-		session.flash({ notification: 'Plante modifiée.' })
-		return response.redirect().toRoute('admin.plants.index')
-	}
+  /**
+   * Formulaire édition plante
+   */
+  public async edit({ params, view }: HttpContextContract) {
+    const plante = await Plant.findOrFail(params.id);
+    return view.render("admin/plants/edit", { plante });
+  }
 
-	/**
-	 * Suppression plante
-	 */
-	public async destroy({ params, response, session }: HttpContextContract) {
-		const plante = await Plant.findOrFail(params.id)
-		await plante.delete()
-		session.flash({ notification: 'Plante supprimée.' })
-		return response.redirect().toRoute('admin.plants.index')
-	}
+  /**
+   * MAJ plante
+   */
+  public async update({
+    params,
+    request,
+    response,
+    session,
+  }: HttpContextContract) {
+    const plante = await Plant.findOrFail(params.id);
+    plante.merge(request.only(["name", "price", "description", "stock"]));
+    await plante.save();
+    session.flash({ notification: "Plante modifiée." });
+    return response.redirect().toRoute("admin.plants.index");
+  }
+
+  /**
+   * Suppression plante
+   */
+  public async destroy({ params, response, session }: HttpContextContract) {
+    const plante = await Plant.findOrFail(params.id);
+    await plante.delete();
+    session.flash({ notification: "Plante supprimée." });
+    return response.redirect().toRoute("admin.plants.index");
+  }
 }
 
 
@@ -3189,7 +3198,7 @@ export default class extends BaseSchema {
 
 		this.schema.createTable('orders', (table) => {
 			table.increments('id')
-			table.integer('user_id').unsigned().references('id').inTable('users')
+			table.integer('user_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
 			table.integer('total_price')
 			table.string('status')
 			table.timestamps(true)
@@ -3197,8 +3206,8 @@ export default class extends BaseSchema {
 
 		this.schema.createTable('order_items', (table) => {
 			table.increments('id')
-			table.integer('order_id').unsigned().references('id').inTable('orders')
-			table.integer('plant_id').unsigned().references('id').inTable('plants')
+			table.integer('order_id').unsigned().references('id').inTable('orders').onDelete('CASCADE')
+			table.integer('plant_id').unsigned().references('id').inTable('plants').onDelete('CASCADE')
 			table.integer('quantity')
 			table.timestamps(true)
 		})
@@ -3505,7 +3514,7 @@ Gestion des plantes
 							<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }) }}"
 										onsubmit="return confirm('Voulez-vous supprimer cette plante ?')">
 								{{ csrfField() }}
-								<button type="submit" class="btn btn-danger">Supprimer</button>
+								<button type="submit" class="btn btn-danger">🗑 Supprimer</button>
 							</form>
 						</div>
 					</td>
