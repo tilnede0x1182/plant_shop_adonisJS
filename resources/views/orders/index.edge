@@ -5,18 +5,29 @@ Mes commandes
 @end
 
 @section('content')
-<h1>Mes commandes</h1>
+<h1 class="text-center mb-4">📜 Mes Commandes</h1>
 @if(orders && orders.length > 0)
-	<ul>
-		@each(order in orders)
-			<li>
-				<a href="{{ route('OrdersController.show', { id: order.id }) }}">
-					Commande #{{ order.id }} du {{ order.createdAt.toLocaleDateString() }} - {{ order.totalPrice }} €
-				</a>
-			</li>
-		@endeach
-	</ul>
+  @each((order, index) in orders)
+    <div class="card mb-3 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Commande n°{{ orders.length - index }}</h5>
+        <p class="mb-1 text-muted">
+          Passée le {{ new Date(order.createdAt).toLocaleDateString('fr-FR') }} {{ new Date(order.createdAt).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) }} – Total : {{ order.totalPrice.toFixed(2).replace('.', ',') }} €
+        </p>
+        <ul class="mb-2">
+          @each(item in order.orderItems)
+            <li>
+              <a href="{{ route('PlantsController.show', { id: item.plant.id }) }}" class="text-decoration-none text-primary">
+                {{ item.plant.name }}
+              </a> {{ item.quantity }} × {{ item.plant.price.toFixed(2).replace('.', ',') }} €
+            </li>
+          @endeach
+        </ul>
+        <p><strong>Statut :</strong> {{ order.status }}</p>
+      </div>
+    </div>
+  @endeach
 @else
-	<p>Aucune commande trouvée.</p>
+  <p class="alert alert-info">Aucune commande pour le moment.</p>
 @endif
 @end
