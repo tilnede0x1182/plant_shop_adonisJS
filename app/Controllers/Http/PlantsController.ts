@@ -11,9 +11,7 @@ export default class PlantsController {
    * Liste des plantes en stock (stock >= 1)
    */
   public async index({ view }: HttpContextContract) {
-    const plants = await Plant.query()
-      .where("stock", ">=", 1)
-      .orderBy("name", "asc");
+    const plants = await Plant.querySortedByName().where("stock", ">=", 1);
     return view.render("plants/index", { plants });
   }
 
