@@ -68,6 +68,7 @@
 │   ├── js
 │   │   └── application.js
 │   └── styles.css
+├── README.md
 ├── resources
 │   ├── views
 │   │   ├── admin
@@ -95,6 +96,7 @@
 │   │   │   ├── create.edge
 │   │   │   ├── index.edge
 │   │   │   ├── new.edge
+│   │   │   ├── _order_card copy.edge
 │   │   │   ├── _order_card.edge
 │   │   │   └── show.edge
 │   │   ├── plants
@@ -122,7 +124,7 @@
 ├── tsconfig.json
 └── users.txt
 
-34 directories, 86 files
+34 directories, 88 files
 
 # CONFIG
 #
@@ -1076,7 +1078,9 @@ export default class UsersController {
 	 */
 	public async update({ params, request, response, session }: HttpContextContract) {
 		const utilisateur = await User.findOrFail(params.id)
-		utilisateur.merge(request.only(['name', 'email', 'admin']))
+		const data = request.only(['name', 'email'])
+		data.admin = !!request.input('admin') // true si coché, false sinon
+		utilisateur.merge(data)
 		await utilisateur.save()
 		session.flash({ notification: 'Utilisateur mis à jour.' })
 		return response.redirect().toRoute('admin.users.index')
@@ -1498,10 +1502,10 @@ Route.get('/', 'PlantsController.index').as('home')
 // Routes nécessitant une authentification
 Route.group(() => {
   // Profil personnel
-  Route.resource('users', 'UsersController').only(['show', 'edit'])
+  Route.resource('users', 'UsersController').only(['show', 'edit', 'update'])
 
 	// Route Post pour update
-	Route.post('/users/:id/update', 'UsersController.update').as('users.update')
+	// Route.post('/users/:id/update', 'UsersController.update').as('users.update')
 
   // Panier
   Route.resource('carts', 'CartsController').only(['index'])
@@ -1515,24 +1519,10 @@ Route.group(() => {
 // Administration
 Route.group(() => {
   // Plantes
-  Route.resource('plants', 'Admin/PlantsController').except(['show', 'destroy', 'update'])
-
-	// Route POST pour modification utilisateurs (update)
-  Route.post('/users/:id/update', 'Admin/PlantsController.update').as('plants.update')
-
-  // Route POST pour suppression plantes
-  Route.post('/plants/:id/delete', 'Admin/PlantsController.destroy')
-    .as('plants.destroy')
+  Route.resource('plants', 'Admin/PlantsController').except(['show'])
 
   // Utilisateurs
-  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit'])
-
-	// Route POST pour modification utilisateurs (update)
-  Route.post('/users/:id/admin_update', 'Admin/UsersController.update').as('users.update')
-
-  // Route POST pour suppression utilisateurs
-  Route.post('/users/:id/delete', 'Admin/UsersController.destroy')
-    .as('users.destroy')
+  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit', 'update', 'destroy'])
 })
   .prefix('admin')
   .as('admin')
@@ -3440,7 +3430,7 @@ Connexion
 	@if(flashMessages.get('error'))
 		<div class="alert alert-danger">{{ flashMessages.get('error') }}</div>
 	@endif
-	<form method="POST" action="{{ route('login.perform') }}">
+	<form method="POST" action="{{ route('login.perform') }}" class="w-100" style="max-width: 500px;">
 		{{ csrfField() }}
 		<div class="mb-3">
 			<label>Email</label>
@@ -3471,7 +3461,7 @@ Modifier plante
 	<div class="container mt-4">
 		<h1 class="mb-4">Modifier une plante</h1>
 
-		@set('action', route('admin.plants.update', { id: plante.id }))
+		@set('action', route('admin.plants.update', { id: plante.id }, { qs: { _method: 'PUT' } }))
 		@set('method', 'PUT')
 		@include('admin/plants/_form')
 	</div>
@@ -3529,7 +3519,7 @@ Gestion des plantes
 					<td class="text-center">
 						<div class="d-flex justify-content-center gap-2">
 							<a href="{{ route('admin.plants.edit', { id: plant.id }) }}" class="btn btn-warning btn-sm">✏ Modifier</a>
-							<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }) }}"
+							<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }, { qs: { _method: 'DELETE' } }) }}"
 										onsubmit="return confirm('Voulez-vous supprimer cette plante ?')">
 								{{ csrfField() }}
 								<button type="submit" class="btn btn-danger">🗑 Supprimer</button>
@@ -3685,7 +3675,7 @@ Liste des utilisateurs
 					<td class="text-center">
 						<div class="d-flex justify-content-center gap-2">
 							<a href="{{ route('admin.users.edit', { id: user.id }) }}" class="btn btn-warning btn-sm">✏ Modifier</a>
-							<form method="POST" action="{{ route('admin.users.destroy', { id: user.id }) }}" class="d-inline">
+							<form method="POST" action="{{ route('admin.users.destroy', { id: user.id }, { qs: { _method: 'DELETE' } }) }}" class="d-inline">
 								{{ csrfField() }}
 								<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet utilisateur ?')">🗑 Supprimer</button>
 							</form>
@@ -3722,7 +3712,7 @@ Liste des utilisateurs
 			</button>
 			@if(auth.user?.admin)
 				<a href="{{ route('admin.plants.edit', { id: plant.id }) }}" class="btn btn-warning">Modifier</a>
-				<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }) }}"
+				<form method="POST" action="{{ route('admin.plants.destroy', { id: plant.id }, { qs: { _method: 'DELETE' } }) }}"
 							onsubmit="return confirm('Voulez-vous supprimer cette plante ?')">
 					{{ csrfField() }}
 					<button type="submit" class="btn btn-danger">Supprimer</button>
@@ -3949,6 +3939,14 @@ Commande créée
 @end
 
 
+## resources/views/orders/_order_card copy.edge
+
+<div>
+	<p>Commande #{{ order.id }} - {{ order.totalPrice }} €</p>
+	<p>Status : {{ order.status }}</p>
+</div>
+
+
 ## resources/views/layouts/_flash_messages.edge
 
 {{-- @if(flashMessages?.all())
@@ -4063,7 +4061,7 @@ S'inscrire
 		<div class="alert alert-danger">{{ flashMessages.get('error') }}</div>
 	@endif
 
-	<form method="POST" action="{{ route('register.perform') }}">
+	<form method="POST" action="{{ route('register.perform') }}" class="w-100" style="max-width: 500px;">
 		{{ csrfField() }}
 
 		<div class="mb-3">
@@ -4164,7 +4162,7 @@ Modifier mon profil
 
 @section('content')
 	<h1>Modifier le profil</h1>
-	<form method="POST" action="{{ route('users.update', { id: utilisateur.id }) }}">
+	<form method="POST" action="{{ route('users.update', { id: utilisateur.id }, { qs: { _method: 'PUT' } }) }}">
 		{{ csrfField() }}
 
 		@if(utilisateur.errors && Object.keys(utilisateur.errors).length)
@@ -4460,7 +4458,7 @@ export default listDirectoryFiles(__dirname, Application.appRoot, ['./commands/i
       1 ## env.ts
       1 ## package.json
       1 ## providers
-     27 ## resources
+     28 ## resources
       1 ## server.ts
       2 ## start
       1 ## tsconfig.json
