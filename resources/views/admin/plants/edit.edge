@@ -8,7 +8,7 @@ Modifier plante
 	<div class="container mt-4">
 		<h1 class="mb-4">Modifier une plante</h1>
 
-		@set('action', route('admin.plants.update', { id: plante.id }))
+		@set('action', route('admin.plants.update', { id: plante.id }, { qs: { _method: 'PUT' } }))
 		@set('method', 'PUT')
 		@include('admin/plants/_form')
 	</div>

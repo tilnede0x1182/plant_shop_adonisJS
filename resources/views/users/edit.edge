@@ -6,7 +6,7 @@ Modifier mon profil
 
 @section('content')
 	<h1>Modifier le profil</h1>
-	<form method="POST" action="{{ route('users.update', { id: utilisateur.id }) }}">
+	<form method="POST" action="{{ route('users.update', { id: utilisateur.id }, { qs: { _method: 'PUT' } }) }}">
 		{{ csrfField() }}
 
 		@if(utilisateur.errors && Object.keys(utilisateur.errors).length)
