@@ -6,11 +6,11 @@ Mes commandes
 
 @section('content')
 <h1 class="text-center mb-4">📜 Mes Commandes</h1>
-@if(orders && orders.length > 0)
-  @each((order, index) in orders)
+@if(commandes && commandes.length > 0)
+  @each((order, index) in commandes)
     <div class="card mb-3 shadow-sm">
       <div class="card-body">
-        <h5 class="card-title">Commande n°{{ orders.length - index }}</h5>
+        <h5 class="card-title">Commande n°{{ commandes.length - index }}</h5>
         <p class="mb-1 text-muted">
           Passée le {{ new Date(order.createdAt).toLocaleDateString('fr-FR') }} {{ new Date(order.createdAt).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) }} – Total : {{ order.totalPrice.toFixed(2).replace('.', ',') }} €
         </p>
