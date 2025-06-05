@@ -95,7 +95,6 @@
 │   │   │   ├── create.edge
 │   │   │   ├── index.edge
 │   │   │   ├── new.edge
-│   │   │   ├── _order_card copy.edge
 │   │   │   ├── _order_card.edge
 │   │   │   └── show.edge
 │   │   ├── plants
@@ -123,7 +122,7 @@
 ├── tsconfig.json
 └── users.txt
 
-34 directories, 87 files
+34 directories, 86 files
 
 # CONFIG
 #
@@ -1513,14 +1512,20 @@ Route.group(() => {
 // Administration
 Route.group(() => {
   // Plantes
-  Route.resource('plants', 'Admin/PlantsController').except(['show', 'destroy'])
+  Route.resource('plants', 'Admin/PlantsController').except(['show', 'destroy', 'update'])
+
+	// Route POST pour modification utilisateurs (update)
+  Route.post('/users/:id/update', 'Admin/PlantsController.update').as('plants.update')
 
   // Route POST pour suppression plantes
   Route.post('/plants/:id/delete', 'Admin/PlantsController.destroy')
     .as('plants.destroy')
 
   // Utilisateurs
-  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit', 'update'])
+  Route.resource('users', 'Admin/UsersController').only(['index', 'show', 'edit'])
+
+	// Route POST pour modification utilisateurs (update)
+  Route.post('/users/:id/admin_update', 'Admin/UsersController.update').as('admin.users.update')
 
   // Route POST pour suppression utilisateurs
   Route.post('/users/:id/delete', 'Admin/UsersController.destroy')
@@ -3619,7 +3624,6 @@ Modifier l’utilisateur
 	<h1>Modifier l’utilisateur</h1>
 	<form method="POST" action="{{ route('admin.users.update', { id: utilisateur.id }) }}">
 		{{ csrfField() }}
-		<input type="hidden" name="_method" value="PUT">
 
 		<div class="mb-3">
 			<label for="email" class="form-label">Email</label>
@@ -3800,8 +3804,10 @@ Mon panier
 @endsection
 
 @section('content')
-	<h1>Mon Panier</h1>
-	<div id="cart-container"></div>
+	<h1 class="text-center mb-4">🛒 Mon Panier</h1>
+	<div id="cart-container">
+		<p class="alert alert-info">Chargement du panier...</p>
+	</div>
 @endsection
 
 
@@ -3897,19 +3903,30 @@ Mes commandes
 @end
 
 @section('content')
-<h1>Mes commandes</h1>
-@if(orders && orders.length > 0)
-	<ul>
-		@each(order in orders)
-			<li>
-				<a href="{{ route('OrdersController.show', { id: order.id }) }}">
-					Commande #{{ order.id }} du {{ order.createdAt.toLocaleDateString() }} - {{ order.totalPrice }} €
-				</a>
-			</li>
-		@endeach
-	</ul>
+<h1 class="text-center mb-4">📜 Mes Commandes</h1>
+@if(commandes && commandes.length > 0)
+  @each((order, index) in commandes)
+    <div class="card mb-3 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Commande n°{{ commandes.length - index }}</h5>
+        <p class="mb-1 text-muted">
+          Passée le {{ new Date(order.createdAt).toLocaleDateString('fr-FR') }} {{ new Date(order.createdAt).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) }} – Total : {{ order.totalPrice.toFixed(2).replace('.', ',') }} €
+        </p>
+        <ul class="mb-2">
+          @each(item in order.orderItems)
+            <li>
+              <a href="{{ route('PlantsController.show', { id: item.plant.id }) }}" class="text-decoration-none text-primary">
+                {{ item.plant.name }}
+              </a> {{ item.quantity }} × {{ item.plant.price.toFixed(2).replace('.', ',') }} €
+            </li>
+          @endeach
+        </ul>
+        <p><strong>Statut :</strong> {{ order.status }}</p>
+      </div>
+    </div>
+  @endeach
 @else
-	<p>Aucune commande trouvée.</p>
+  <p class="alert alert-info">Aucune commande pour le moment.</p>
 @endif
 @end
 
@@ -3927,14 +3944,6 @@ Commande créée
 <p>Votre commande a bien été enregistrée.</p>
 <a href="{{ route('OrdersController.index') }}">Retour à mes commandes</a>
 @end
-
-
-## resources/views/orders/_order_card copy.edge
-
-<div>
-	<p>Commande #{{ order.id }} - {{ order.totalPrice }} €</p>
-	<p>Status : {{ order.status }}</p>
-</div>
 
 
 ## resources/views/layouts/_flash_messages.edge
@@ -4152,9 +4161,8 @@ Modifier mon profil
 
 @section('content')
 	<h1>Modifier le profil</h1>
-	<form method="POST" action="{{ route('UsersController.update', { id: utilisateur.id }) }}">
+	<form method="POST" action="{{ route('users.update', { id: utilisateur.id }) }}">
 		{{ csrfField() }}
-		<input type="hidden" name="_method" value="PUT">
 
 		@if(utilisateur.errors && Object.keys(utilisateur.errors).length)
 			<div class="alert alert-danger">
@@ -4449,7 +4457,7 @@ export default listDirectoryFiles(__dirname, Application.appRoot, ['./commands/i
       1 ## env.ts
       1 ## package.json
       1 ## providers
-     28 ## resources
+     27 ## resources
       1 ## server.ts
       2 ## start
       1 ## tsconfig.json
