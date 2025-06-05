@@ -11,7 +11,7 @@ S'inscrire
 		<div class="alert alert-danger">{{ flashMessages.get('error') }}</div>
 	@endif
 
-	<form method="POST" action="{{ route('register.perform') }}">
+	<form method="POST" action="{{ route('register.perform') }}" class="w-100" style="max-width: 500px;">
 		{{ csrfField() }}
 
 		<div class="mb-3">

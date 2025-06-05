@@ -9,7 +9,7 @@ Connexion
 	@if(flashMessages.get('error'))
 		<div class="alert alert-danger">{{ flashMessages.get('error') }}</div>
 	@endif
-	<form method="POST" action="{{ route('login.perform') }}">
+	<form method="POST" action="{{ route('login.perform') }}" class="w-100" style="max-width: 500px;">
 		{{ csrfField() }}
 		<div class="mb-3">
 			<label>Email</label>

@@ -33,7 +33,7 @@ Liste des utilisateurs
 					<td class="text-center">
 						<div class="d-flex justify-content-center gap-2">
 							<a href="{{ route('admin.users.edit', { id: user.id }) }}" class="btn btn-warning btn-sm">✏ Modifier</a>
-							<form method="POST" action="{{ route('admin.users.destroy', { id: user.id }) }}" class="d-inline">
+							<form method="POST" action="{{ route('admin.users.destroy', { id: user.id }, { qs: { _method: 'DELETE' } }) }}" class="d-inline">
 								{{ csrfField() }}
 								<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet utilisateur ?')">🗑 Supprimer</button>
 							</form>

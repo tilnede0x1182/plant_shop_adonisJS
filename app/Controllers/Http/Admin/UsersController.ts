@@ -36,7 +36,9 @@ export default class UsersController {
 	 */
 	public async update({ params, request, response, session }: HttpContextContract) {
 		const utilisateur = await User.findOrFail(params.id)
-		utilisateur.merge(request.only(['name', 'email', 'admin']))
+		const data = request.only(['name', 'email'])
+		data.admin = !!request.input('admin') // true si coché, false sinon
+		utilisateur.merge(data)
 		await utilisateur.save()
 		session.flash({ notification: 'Utilisateur mis à jour.' })
 		return response.redirect().toRoute('admin.users.index')
