@@ -3,6 +3,9 @@ import { BaseModel, column, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
 import Order from './Order'
 import Plant from './Plant'
 
+/**
+ * Modèle OrderItem - Représente un article dans une commande.
+ */
 export default class OrderItem extends BaseModel {
 	@column({ isPrimary: true })
 	public id: number

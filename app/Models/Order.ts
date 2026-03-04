@@ -3,6 +3,9 @@ import { BaseModel, column, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:
 import User from './User'
 import OrderItem from './OrderItem'
 
+/**
+ * Modèle Order - Représente une commande utilisateur.
+ */
 export default class Order extends BaseModel {
 	@column({ isPrimary: true })
 	public id: number

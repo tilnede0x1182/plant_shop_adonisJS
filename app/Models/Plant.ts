@@ -2,6 +2,9 @@ import { DateTime } from "luxon";
 import { BaseModel, column, hasMany, HasMany } from "@ioc:Adonis/Lucid/Orm";
 import OrderItem from "./OrderItem";
 
+/**
+ * Modèle Plant - Représente une plante dans le catalogue.
+ */
 export default class Plant extends BaseModel {
   @column({ isPrimary: true })
   public id: number;
