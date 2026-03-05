@@ -140,8 +140,11 @@ async function createOrders(users, plants) {
 }
 
 /**
-	Écrit les utilisateurs/admins dans users.txt
-*/
+ * Ecrit les utilisateurs/admins dans users.txt
+ *
+ * @param admins Array liste des administrateurs
+ * @param users Array liste des utilisateurs
+ */
 function writeUsersFile(admins, users) {
 	const filePath = path.join(process.cwd(), 'users.txt')
 	let content = 'Administrateurs :\n\n'
